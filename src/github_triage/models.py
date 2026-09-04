@@ -40,6 +40,14 @@ class TriageDecision(BaseModel):
     needs_human_review: bool
 
 
+class AgentTriageDecision(BaseModel):
+    """Gemini-compatible response schema; service revalidates it strictly."""
+
+    issue_type: IssueType
+    priority: Priority
+    needs_human_review: bool
+
+
 class Annotation(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 

@@ -35,6 +35,16 @@ def _git_commit() -> str | None:
     return completed.stdout.strip() if completed.returncode == 0 else None
 
 
+def _git_worktree_dirty() -> bool | None:
+    completed = subprocess.run(
+        ["git", "status", "--porcelain"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return bool(completed.stdout) if completed.returncode == 0 else None
+
+
 def _base_config(args: argparse.Namespace) -> AgentConfig:
     defaults = AgentConfig.from_env()
     return AgentConfig(
@@ -68,7 +78,14 @@ async def _evaluate(args: argparse.Namespace) -> int:
         input_per_million=args.input_price_per_million,
         output_per_million=args.output_price_per_million,
     )
-    results = await evaluate_records(records, service.triage, pricing)
+    results = await evaluate_records(
+        records,
+        service.triage,
+        pricing,
+        requests_per_minute=args.requests_per_minute,
+        max_attempts=args.max_attempts,
+        retry_delay_seconds=args.retry_delay_seconds,
+    )
     metrics = compute_metrics(results)
     run_config: dict[str, Any] = {
         "experiment": args.experiment,
@@ -80,7 +97,11 @@ async def _evaluate(args: argparse.Namespace) -> int:
         "dataset_versions": sorted({record.dataset_version for record in records}),
         "input_price_per_million_usd": pricing.input_per_million,
         "output_price_per_million_usd": pricing.output_per_million,
+        "requests_per_minute": args.requests_per_minute,
+        "max_attempts": args.max_attempts,
+        "retry_delay_seconds": args.retry_delay_seconds,
         "git_commit": _git_commit(),
+        "git_worktree_dirty": _git_worktree_dirty(),
     }
     output = args.output_root / args.experiment
     write_experiment(output, config=run_config, results=results, metrics=metrics)
@@ -120,6 +141,13 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--prompt", type=Path)
     evaluate.add_argument("--input-price-per-million", type=float, required=True)
     evaluate.add_argument("--output-price-per-million", type=float, required=True)
+    evaluate.add_argument(
+        "--requests-per-minute",
+        type=float,
+        help="pace calls to fit a provider quota (for example, 12 for a 15 RPM tier)",
+    )
+    evaluate.add_argument("--max-attempts", type=int, default=3)
+    evaluate.add_argument("--retry-delay-seconds", type=float, default=30)
     evaluate.add_argument("--output-root", type=Path, default=Path("artifacts"))
     evaluate.set_defaults(handler=_evaluate)
 

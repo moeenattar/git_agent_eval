@@ -1,0 +1,20 @@
+{
+  "baseline_cost_per_1000_usd": 0.30250666666666665,
+  "baseline_critical_under_triage": 1,
+  "baseline_exact_match_accuracy": 0.5333333333333333,
+  "baseline_human_review_false_negatives": 4,
+  "candidate_cost_per_1000_usd": 0.38824,
+  "candidate_critical_under_triage": 0,
+  "candidate_exact_match_accuracy": 0.8,
+  "candidate_human_review_false_negatives": 0,
+  "case_count": 15,
+  "cost_multiplier": 1.2834097320169253,
+  "exact_match_accuracy_delta": 0.26666666666666666,
+  "paired_bootstrap_delta_95_ci": [
+    0.06666666666666667,
+    0.5333333333333333
+  ],
+  "promotion_recommended": true,
+  "safety_gates_pass": true,
+  "statistically_clear_improvement": true
+}

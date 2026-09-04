@@ -9,8 +9,8 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class AgentConfig:
-    model: str = "gemini-2.5-flash"
-    prompt_path: Path = Path("prompts/triage_v1.txt")
+    model: str = "gemini-3.5-flash-lite"
+    prompt_path: Path = Path("prompts/triage_v2.txt")
     app_name: str = "github_triage"
 
     @classmethod

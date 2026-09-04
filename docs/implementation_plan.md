@@ -27,16 +27,19 @@ Status: complete — dataset `v1` frozen on 2026-09-05
 
 ## Milestone 3 Baseline experiment
 
-Status: next — pending Gemini credentials
+Status: complete — selected prompt tested on 2026-09-05
 
-- Run the baseline prompt with a cost-oriented Gemini model.
-- Capture predictions, token usage, latency, normalized list-price cost, and Phoenix traces.
-- Inspect calibration failures only and write `triage_v2.txt` from general policy improvements.
-- Keep the golden test split unseen during prompt iteration.
+- [x] Run prompt v1 with the cost-oriented `gemini-3.5-flash-lite` model.
+- [x] Capture predictions, token usage, latency, and normalized list-price cost in file artifacts.
+- [x] Inspect calibration failures only and write `triage_v2.txt` from general policy improvements.
+- [x] Select v2 using the paired calibration comparison and safety gates.
+- [x] Keep the golden split unseen during prompt iteration, then run the selected candidate once.
+
+Phoenix remained optional and was not required for the authoritative experiment artifacts.
 
 ## Milestone 4 Cost and quality comparison
 
-Status: pending milestone 3
+Status: next
 
 - Compare prompt v1 and v2 while holding the model fixed.
 - Compare a cost-oriented and a quality-oriented model while holding prompt v2 fixed.

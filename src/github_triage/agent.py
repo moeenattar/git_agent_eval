@@ -5,7 +5,7 @@ from pathlib import Path
 from google.adk.agents import LlmAgent
 from google.genai import types
 
-from github_triage.models import IssueInput, TriageDecision
+from github_triage.models import AgentTriageDecision, IssueInput
 
 
 def load_prompt(path: Path) -> str:
@@ -24,7 +24,7 @@ def build_agent(*, model: str, prompt_path: Path) -> LlmAgent:
         model=model,
         instruction=load_prompt(prompt_path),
         input_schema=IssueInput,
-        output_schema=TriageDecision,
+        output_schema=AgentTriageDecision,
         output_key="triage_decision",
         generate_content_config=types.GenerateContentConfig(temperature=0),
     )

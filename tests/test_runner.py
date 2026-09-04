@@ -55,3 +55,29 @@ async def test_runner_preserves_failed_case() -> None:
 
     assert results[0].prediction is None
     assert results[0].error == "TimeoutError: model timed out"
+
+
+@pytest.mark.asyncio
+async def test_runner_retries_quota_error() -> None:
+    attempts = 0
+
+    async def predictor(_issue):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise RuntimeError("429 RESOURCE_EXHAUSTED")
+        return TriageResult(
+            decision=TriageDecision(issue_type="bug", priority="medium", needs_human_review=False),
+            latency_ms=10,
+        )
+
+    results = await evaluate_records(
+        [_record("one")],
+        predictor,
+        ModelPricing(input_per_million=0, output_per_million=0),
+        max_attempts=2,
+        retry_delay_seconds=0,
+    )
+
+    assert attempts == 2
+    assert results[0].prediction == results[0].gold
