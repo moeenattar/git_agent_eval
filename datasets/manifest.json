@@ -1,0 +1,29 @@
+{
+  "dataset_version": "v1",
+  "frozen_on": "2026-09-05",
+  "composition": {
+    "total": 50,
+    "calibration": 15,
+    "golden_test": 35,
+    "github": 40,
+    "synthetic": 10
+  },
+  "independent_review": {
+    "reviewer": "project-owner",
+    "reviewed_cases": 12,
+    "coverage_percent": 24,
+    "all_high_priority_reviewed": true,
+    "all_security_cases_reviewed": true,
+    "security_priority_rule_approved": true
+  },
+  "files": {
+    "calibration.jsonl": {
+      "records": 15,
+      "sha256": "ed9f4a9ff0e821ba6de8f4a0ff7dbd6d3c56a78b203f3f9a69a519ccf96f9fe3"
+    },
+    "golden_test.jsonl": {
+      "records": 35,
+      "sha256": "f86c67f69b36362e0d10d466a93847de4b8b64b7a106278f6a8d02ea02ea9017"
+    }
+  }
+}

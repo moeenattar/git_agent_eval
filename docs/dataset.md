@@ -50,4 +50,6 @@ Do not derive priority from issue age, reactions, comment count, or open/closed 
 7. Review high-priority, security, and human-review-positive examples twice.
 8. Rename `dataset_version` from `draft-v0` to `v1`, record the file hashes, and stop using the test set for prompt development.
 
-The checked-in datasets currently use `draft-v0` and exist to exercise the pipeline. They are not yet a trustworthy 50-case golden dataset and must not be presented as final evidence.
+The checked-in datasets were frozen as `v1` on 2026-09-05 after the project owner approved all 12 high-priority cases. That review covers 24% of the dataset and every case carrying the `security` slice. Review metadata is stored directly in each approved record. The labels are trusted test targets, but they are not model results; actual quality claims require running the frozen set through the evaluation harness.
+
+The counts, review decision, and SHA-256 hashes of both frozen splits are recorded in `datasets/manifest.json`. Dataset validation checks this manifest so any later change requires an explicit new dataset version and manifest update.

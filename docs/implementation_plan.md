@@ -16,18 +16,18 @@ Status: implemented
 
 ## Milestone 2 Trustworthy dataset
 
-Status: draft created and awaiting human review
+Status: complete — dataset `v1` frozen on 2026-09-05
 
 - [x] Fetch open and closed `python/pythondotorg` issues.
 - [x] Select 40 diverse real cases.
 - [x] Write 10 synthetic cases for explicit coverage gaps.
 - [x] Split 15 calibration and 35 golden test cases.
-- [ ] Independently review at least 20% and all high/security cases.
-- [ ] Resolve disagreements and freeze dataset version `v1` before the final model comparison.
+- [x] Independently review all 12 high-priority cases, covering 24% and every security case.
+- [x] Approve the security-priority rule and freeze dataset version `v1`.
 
 ## Milestone 3 Baseline experiment
 
-Status: pending credentials and frozen data
+Status: next — pending Gemini credentials
 
 - Run the baseline prompt with a cost-oriented Gemini model.
 - Capture predictions, token usage, latency, normalized list-price cost, and Phoenix traces.

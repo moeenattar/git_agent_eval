@@ -6,7 +6,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from github_triage.evaluation.dataset import find_cross_split_leakage, load_dataset
+from github_triage.evaluation.dataset import (
+    find_cross_split_leakage,
+    find_manifest_errors,
+    find_review_coverage_errors,
+    load_dataset,
+)
 
 
 def main() -> int:
@@ -16,6 +21,14 @@ def main() -> int:
 
     loaded = {path.stem: load_dataset(path) for path in args.datasets}
     errors = find_cross_split_leakage(loaded)
+    errors.extend(
+        find_review_coverage_errors([record for records in loaded.values() for record in records])
+    )
+    parents = {path.parent.resolve() for path in args.datasets}
+    if len(parents) == 1:
+        manifest_path = parents.pop() / "manifest.json"
+        if manifest_path.exists():
+            errors.extend(find_manifest_errors(manifest_path))
     for name, records in loaded.items():
         print(f"{name}: {len(records)} valid records")
     if errors:

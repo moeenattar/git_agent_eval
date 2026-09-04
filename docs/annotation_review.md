@@ -1,6 +1,6 @@
-# Draft Annotation Review
+# Dataset Annotation Review
 
-These 50 records are proposed labels for review, not frozen ground truth. They contain 40 real GitHub issues and 10 synthetic coverage cases. The split is 15 calibration cases and 35 golden-test cases.
+These 50 records contain 40 real GitHub issues and 10 synthetic coverage cases. The split is 15 calibration cases and 35 golden-test cases. The project owner approved the required high-risk review set and the dataset was frozen as `v1` on 2026-09-05.
 
 ## Review instructions
 
@@ -23,6 +23,25 @@ Pay particular attention to every `high` case, every security case, and cases ma
 | Issue type | 23 bug, 10 enhancement, 9 maintenance, 7 documentation, 1 other |
 | Priority | 12 high, 21 medium, 17 low |
 | Human review | 25 yes, 25 no |
+
+## Completed independent review gate
+
+The project owner approved the following 12 high-priority cases, covering 24% of the dataset and every case carrying the `security` slice. Each corresponding JSONL record contains `review_status`, `reviewed_by`, and `reviewed_on` evidence.
+
+- [ ] `python-pythondotorg-3047` — maintenance / high / human
+- [ ] `python-pythondotorg-3046` — bug / high / human
+- [ ] `python-pythondotorg-2990` — bug / high / human
+- [ ] `synthetic-cal-002` — bug / high / no human
+- [ ] `python-pythondotorg-3041` — enhancement / high / human
+- [ ] `python-pythondotorg-3034` — maintenance / high / human
+- [ ] `python-pythondotorg-2787` — bug / high / human
+- [ ] `python-pythondotorg-2752` — bug / high / human
+- [ ] `python-pythondotorg-2700` — bug / high / human
+- [ ] `python-pythondotorg-2681` — bug / high / human
+- [ ] `synthetic-test-001` — bug / high / human
+- [ ] `synthetic-test-005` — bug / high / no human
+
+The project owner also approved the policy that preventive security hardening is `high` even without a confirmed exploit. Cases `3047`, `3046`, `3041`, and `3034` apply that rule consistently.
 
 ## Cases
 

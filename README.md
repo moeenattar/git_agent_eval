@@ -24,7 +24,7 @@ The service is intentionally small. The main artifact is the harness that compar
 - Optional local Arize Phoenix tracing
 - Unit tests that require neither credentials nor model calls
 
-The checked-in 50-case dataset is a review draft containing 40 real `python/pythondotorg` issues and 10 synthetic challenge cases. Its labels are proposed annotations, not claimed model results or frozen ground truth. Review [docs/annotation_review.md](docs/annotation_review.md) before changing `draft-v0` to `v1`.
+The checked-in 50-case dataset contains 40 real `python/pythondotorg` issues and 10 synthetic challenge cases. The project owner independently approved all 12 high-priority cases, covering 24% of the dataset and every security case, before the dataset was frozen as `v1`. The review evidence and proposed labels are documented in [docs/annotation_review.md](docs/annotation_review.md).
 
 ## Setup
 

@@ -6,8 +6,10 @@ import pytest
 from github_triage.evaluation.dataset import (
     DatasetError,
     find_cross_split_leakage,
+    find_review_coverage_errors,
     load_dataset,
 )
+from github_triage.models import DatasetRecord
 
 
 def _record(case_id: str, title: str = "Broken search") -> dict:
@@ -47,3 +49,14 @@ def test_cross_split_leakage_detects_same_content(tmp_path: Path) -> None:
     )
 
     assert errors == ["content for 'test-1' appears in both calibration and test"]
+
+
+def test_frozen_high_priority_case_requires_review() -> None:
+    value = _record("high-risk")
+    value["dataset_version"] = "v1"
+    value["gold"]["priority"] = "high"
+    record = DatasetRecord.model_validate(value)
+
+    errors = find_review_coverage_errors([record])
+
+    assert "high/security case 'high-risk' has no independent review" in errors

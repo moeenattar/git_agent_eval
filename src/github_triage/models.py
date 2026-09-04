@@ -1,6 +1,8 @@
 """Shared data contracts for inference and evaluation."""
 
+from datetime import date
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -43,6 +45,16 @@ class Annotation(BaseModel):
 
     reason: str = Field(min_length=1)
     annotator: str | None = None
+    reviewed_by: str | None = None
+    review_status: Literal["approved", "changed"] | None = None
+    reviewed_on: date | None = None
+
+    @field_validator("reviewed_by")
+    @classmethod
+    def nonempty_reviewer(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("reviewed_by cannot be blank")
+        return value
 
 
 class DatasetRecord(BaseModel):
