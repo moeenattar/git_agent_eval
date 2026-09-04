@@ -24,7 +24,7 @@ The service is intentionally small. The main artifact is the harness that compar
 - Optional local Arize Phoenix tracing
 - Unit tests that require neither credentials nor model calls
 
-The sample datasets are illustrative challenge cases, not claimed model results. Real `python/pythondotorg` issues must be manually annotated under the documented policy before the golden test set is frozen.
+The checked-in 50-case dataset is a review draft containing 40 real `python/pythondotorg` issues and 10 synthetic challenge cases. Its labels are proposed annotations, not claimed model results or frozen ground truth. Review [docs/annotation_review.md](docs/annotation_review.md) before changing `draft-v0` to `v1`.
 
 ## Setup
 

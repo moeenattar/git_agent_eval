@@ -16,14 +16,14 @@ Status: implemented
 
 ## Milestone 2 Trustworthy dataset
 
-Status: next
+Status: draft created and awaiting human review
 
-- Fetch open and closed `python/pythondotorg` issues.
-- Select approximately 40 diverse real cases.
-- Write 10 synthetic cases for explicit coverage gaps.
-- Independently review at least 20% and all high/security cases.
-- Split 15 calibration and 35 golden test cases.
-- Freeze dataset version `v1` before the final model comparison.
+- [x] Fetch open and closed `python/pythondotorg` issues.
+- [x] Select 40 diverse real cases.
+- [x] Write 10 synthetic cases for explicit coverage gaps.
+- [x] Split 15 calibration and 35 golden test cases.
+- [ ] Independently review at least 20% and all high/security cases.
+- [ ] Resolve disagreements and freeze dataset version `v1` before the final model comparison.
 
 ## Milestone 3 Baseline experiment
 
