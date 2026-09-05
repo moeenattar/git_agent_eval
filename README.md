@@ -66,6 +66,10 @@ Neither Groq model is promoted. The 20B candidate was 58.7% cheaper and faster t
 
 The GPT-OSS 120B repeat produced the same 51.4% exact match and the same safety counts. Exact three-field agreement was 88.6%; issue-type and human-review agreement were 100%, while priority agreement was 88.6%. This is reasonably stable but does not reverse the safety rejection. The retained assisted baseline is Gemini 3.5 Flash-Lite with prompt v2. See [docs/milestone4_results.md](docs/milestone4_results.md) for paired intervals, agreement, and the decision record.
 
+### Prompt optimization follow-up
+
+A calibration-only v3–v5 iteration selected prompt v5 for one frozen golden run. Relative to v2, v5 increased exact match from 54.3% to 60.0% and reduced high-priority downgrades from two to one, while human-review false negatives remained at four and critical under-triage remained zero. The paired accuracy interval (-11.4 to +22.9 points) crossed zero, human-review macro-F1 fell from 0.857 to 0.771, and normalized cost increased 30.3%, so v5 was not promoted. Prompt v2 remains the assisted baseline. See [docs/prompt_optimization_results.md](docs/prompt_optimization_results.md) for the calibration protocol, full metrics, fingerprints, and decision.
+
 ## Setup
 
 Python 3.11–3.14 is supported.
@@ -259,7 +263,7 @@ triage phoenix \
 
 Live mode sends every dataset input to the selected external provider. Use it only after approving that provider and dataset combination. Gemini IDs must begin with `gemini-`; Groq remains restricted to the two verified GPT-OSS models.
 
-Browse Phoenix at [http://localhost:6006](http://localhost:6006). See [docs/phoenix_experiments.md](docs/phoenix_experiments.md) for exact setup, live-run commands, evaluator score semantics, and the verified local parity result. Files produced by the harness remain the source of truth for pass/fail decisions.
+Browse Phoenix at [http://localhost:6006](http://localhost:6006). See [docs/phoenix_experiments.md](docs/phoenix_experiments.md) for exact setup, evaluator semantics, and the verified local parity result. The [model comparison runbook](docs/model_comparison_runbook.md) contains copy-paste evaluation, paired comparison, Phoenix replay, and live-run commands for all selected Gemini and Groq models. Files produced by the harness remain the source of truth for pass/fail decisions.
 
 ## Test
 

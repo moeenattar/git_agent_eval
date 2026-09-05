@@ -12,7 +12,16 @@ artifacts/*
 !artifacts/calibration-flash-lite-v1/**
 !artifacts/calibration-flash-lite-v2/
 !artifacts/calibration-flash-lite-v2/**
+!artifacts/calibration-flash-lite-v3/
+!artifacts/calibration-flash-lite-v3/**
+!artifacts/calibration-flash-lite-v4/
+!artifacts/calibration-flash-lite-v4/**
+!artifacts/calibration-flash-lite-v5/
+!artifacts/calibration-flash-lite-v5/**
 !artifacts/calibration-v1-v2.json
+!artifacts/calibration-prompt-v2-v3.json
+!artifacts/calibration-prompt-v2-v4.json
+!artifacts/calibration-prompt-v2-v5.json
 !artifacts/golden-*/
 !artifacts/golden-*/**
 !artifacts/golden-*.json

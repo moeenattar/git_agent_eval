@@ -1,0 +1,18 @@
+{
+  "dataset_path": "datasets/calibration.jsonl",
+  "dataset_sha256": "ed9f4a9ff0e821ba6de8f4a0ff7dbd6d3c56a78b203f3f9a69a519ccf96f9fe3",
+  "dataset_versions": [
+    "v1"
+  ],
+  "experiment": "calibration-flash-lite-v5",
+  "git_commit": "6697f3fc13256a6e05750700b2133c03fa51ba02",
+  "git_worktree_dirty": true,
+  "input_price_per_million_usd": 0.3,
+  "max_attempts": 3,
+  "model": "gemini-3.5-flash-lite",
+  "output_price_per_million_usd": 2.5,
+  "prompt_path": "prompts/triage_v5.txt",
+  "prompt_sha256": "29744625ebf47c6cda1170507e234381b6f1d94bc7d33558157bb581cd7a0724",
+  "requests_per_minute": 6.0,
+  "retry_delay_seconds": 30.0
+}

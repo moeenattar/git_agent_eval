@@ -49,6 +49,18 @@ Status: complete — evaluated and decided on 2026-09-05
 
 Decision: retain Gemini 3.5 Flash-Lite with prompt v2 as the assisted baseline. None of the evaluated configurations is approved for unsupervised routing.
 
+### Prompt optimization follow-up
+
+Status: complete — evaluated and decided on 2026-09-06
+
+- [x] Iterate prompts v3–v5 using only the calibration split.
+- [x] Reject v3 because it introduced a human-review false negative.
+- [x] Freeze v5 after it reached 86.7% calibration exact match with no safety violations.
+- [x] Run v5 once on the golden split and compare it with v2.
+- [x] Retain v2 because v5's +5.7-point exact-match delta was not statistically clear, human-review macro-F1 fell, and normalized cost increased 30.3%.
+
+See `docs/prompt_optimization_results.md` for the complete decision record.
+
 ## Milestone 5 Submission
 
 Status: next
