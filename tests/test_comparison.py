@@ -34,6 +34,8 @@ def test_comparison_is_paired_and_detects_improvement() -> None:
 
     assert comparison["exact_match_accuracy_delta"] == 1
     assert comparison["paired_bootstrap_delta_95_ci"] == [1, 1]
+    assert comparison["prediction_agreement_rate"] == 0
+    assert comparison["field_agreement"]["issue_type"] == 1
     assert comparison["promotion_recommended"] is True
 
 
@@ -54,3 +56,25 @@ def test_comparison_rejects_safety_regression() -> None:
 
     assert comparison["safety_gates_pass"] is False
     assert comparison["promotion_recommended"] is False
+
+
+def test_comparison_reports_repeat_agreement() -> None:
+    high_human = _decision(priority="high", human=True)
+    medium_human = _decision(priority="medium", human=True)
+    first = [
+        _result("same", high_human, high_human),
+        _result("flip", high_human, medium_human),
+    ]
+    second = [
+        _result("same", high_human, high_human),
+        _result("flip", high_human, high_human),
+    ]
+
+    comparison = compare_experiments(first, second, samples=100, seed=7)
+
+    assert comparison["prediction_agreement_rate"] == 0.5
+    assert comparison["field_agreement"] == {
+        "issue_type": 1,
+        "priority": 0.5,
+        "needs_human_review": 1,
+    }

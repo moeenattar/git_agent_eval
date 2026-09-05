@@ -40,6 +40,10 @@ def compare_experiments(
 
     case_ids = sorted(baseline_by_id)
     paired_deltas: list[int] = []
+    exact_agreements = 0
+    type_agreements = 0
+    priority_agreements = 0
+    human_review_agreements = 0
     for case_id in case_ids:
         base = baseline_by_id[case_id]
         cand = candidate_by_id[case_id]
@@ -48,6 +52,13 @@ def compare_experiments(
         base_correct = base.prediction is not None and base.prediction == base.gold
         cand_correct = cand.prediction is not None and cand.prediction == cand.gold
         paired_deltas.append(int(cand_correct) - int(base_correct))
+        if base.prediction is not None and cand.prediction is not None:
+            exact_agreements += base.prediction == cand.prediction
+            type_agreements += base.prediction.issue_type == cand.prediction.issue_type
+            priority_agreements += base.prediction.priority == cand.prediction.priority
+            human_review_agreements += (
+                base.prediction.needs_human_review == cand.prediction.needs_human_review
+            )
 
     generator = random.Random(seed)
     size = len(paired_deltas)
@@ -65,8 +76,11 @@ def compare_experiments(
     safety_pass = (
         candidate_metrics["critical_under_triage_count"]
         <= base_metrics["critical_under_triage_count"]
+        and candidate_metrics["high_priority_downgrades_count"]
+        <= base_metrics["high_priority_downgrades_count"]
         and candidate_metrics["human_review_false_negatives"]
         <= base_metrics["human_review_false_negatives"]
+        and candidate_metrics["errors"] <= base_metrics["errors"]
     )
     accuracy_delta = sum(paired_deltas) / size
 
@@ -78,11 +92,23 @@ def compare_experiments(
         "paired_bootstrap_delta_95_ci": delta_ci,
         "baseline_critical_under_triage": base_metrics["critical_under_triage_count"],
         "candidate_critical_under_triage": candidate_metrics["critical_under_triage_count"],
+        "baseline_high_priority_downgrades": base_metrics["high_priority_downgrades_count"],
+        "candidate_high_priority_downgrades": candidate_metrics[
+            "high_priority_downgrades_count"
+        ],
         "baseline_human_review_false_negatives": base_metrics["human_review_false_negatives"],
         "candidate_human_review_false_negatives": candidate_metrics["human_review_false_negatives"],
+        "baseline_errors": base_metrics["errors"],
+        "candidate_errors": candidate_metrics["errors"],
         "baseline_cost_per_1000_usd": base_cost,
         "candidate_cost_per_1000_usd": candidate_cost,
         "cost_multiplier": cost_multiplier,
+        "prediction_agreement_rate": exact_agreements / size,
+        "field_agreement": {
+            "issue_type": type_agreements / size,
+            "priority": priority_agreements / size,
+            "needs_human_review": human_review_agreements / size,
+        },
         "safety_gates_pass": safety_pass,
         "statistically_clear_improvement": delta_ci[0] > 0,
         "promotion_recommended": safety_pass and delta_ci[0] > 0,

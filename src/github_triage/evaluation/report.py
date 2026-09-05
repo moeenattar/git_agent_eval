@@ -53,6 +53,7 @@ Dataset: `{config["dataset_path"]}`
 | Human-review macro-F1 | {metrics["human_review_macro_f1"]:.3f} |
 | Human-review false negatives | {metrics["human_review_false_negatives"]} |
 | Critical high-to-low under-triage | {metrics["critical_under_triage_count"]} |
+| Any high-priority downgrade | {metrics["high_priority_downgrades_count"]} |
 | Mean latency | {latency["mean"]:.1f} ms |
 | p95 latency | {latency["p95"]:.1f} ms |
 | Normalized cost per 1,000 issues | ${cost["per_1000_issues"]:.4f} |

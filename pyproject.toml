@@ -23,6 +23,9 @@ observability = [
   "arize-phoenix-otel>=0.16",
   "openinference-instrumentation-google-adk>=0.1",
 ]
+groq = [
+  "litellm==1.99.0",
+]
 
 [project.scripts]
 triage = "github_triage.cli:main"

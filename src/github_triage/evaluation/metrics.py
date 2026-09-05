@@ -94,6 +94,11 @@ def compute_metrics(results: Sequence[PredictionRecord]) -> dict[str, Any]:
         and item.prediction.priority is Priority.LOW
         for item in results
     )
+    high_priority_downgrades = sum(
+        item.gold.priority is Priority.HIGH
+        and (item.prediction is None or item.prediction.priority is not Priority.HIGH)
+        for item in results
+    )
     ci_low, ci_high = bootstrap_accuracy_interval(exact)
     latencies = [item.latency_ms for item in results]
     known_costs = [
@@ -116,6 +121,7 @@ def compute_metrics(results: Sequence[PredictionRecord]) -> dict[str, Any]:
         "human_review_false_negatives": human_false_negatives,
         "human_review_false_negative_rate": _safe_div(human_false_negatives, human_required),
         "critical_under_triage_count": critical_under_triage,
+        "high_priority_downgrades_count": high_priority_downgrades,
         "latency_ms": {
             "mean": sum(latencies) / len(latencies),
             "p95": _percentile(latencies, 0.95),

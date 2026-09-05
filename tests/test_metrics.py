@@ -50,10 +50,28 @@ def test_metrics_count_failures_and_safety_errors() -> None:
     assert metrics["exact_match_accuracy"] == pytest.approx(1 / 3)
     assert metrics["errors"] == 1
     assert metrics["critical_under_triage_count"] == 1
+    assert metrics["high_priority_downgrades_count"] == 1
     assert metrics["human_review_false_negatives"] == 1
     assert metrics["human_review_false_negative_rate"] == 1
     assert metrics["estimated_cost_usd"]["total"] == pytest.approx(0.003)
     assert metrics["estimated_cost_usd"]["per_1000_issues"] == pytest.approx(1.5)
+
+
+def test_metrics_count_high_to_medium_as_priority_downgrade() -> None:
+    results = [
+        PredictionRecord(
+            id="security",
+            gold=_decision("bug", "high", True),
+            prediction=_decision("bug", "medium", True),
+            slices=["security"],
+            latency_ms=10,
+        )
+    ]
+
+    metrics = compute_metrics(results)
+
+    assert metrics["critical_under_triage_count"] == 0
+    assert metrics["high_priority_downgrades_count"] == 1
 
 
 def test_bootstrap_interval_is_reproducible_and_bounded() -> None:

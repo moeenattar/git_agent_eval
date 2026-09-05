@@ -10,6 +10,8 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 from github_triage.config import AgentConfig, ModelPricing
 from github_triage.evaluation.comparison import compare_experiments, load_predictions
 from github_triage.evaluation.dataset import load_dataset
@@ -160,6 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    load_dotenv()
     args = build_parser().parse_args()
     return asyncio.run(args.handler(args))
 

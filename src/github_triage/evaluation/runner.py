@@ -14,9 +14,12 @@ from github_triage.service import TriageResult
 Predictor = Callable[[IssueInput], Awaitable[TriageResult]]
 
 
-def _is_retryable_quota_error(exc: Exception) -> bool:
+def _is_retryable_model_error(exc: Exception) -> bool:
     message = f"{type(exc).__name__}: {exc}".lower()
-    return "resource_exhausted" in message or "429" in message
+    return any(
+        marker in message
+        for marker in ("resource_exhausted", "429", "unavailable", "503")
+    )
 
 
 async def evaluate_records(
@@ -65,7 +68,7 @@ async def evaluate_records(
                 )
                 break
             except Exception as exc:
-                if attempt + 1 < max_attempts and _is_retryable_quota_error(exc):
+                if attempt + 1 < max_attempts and _is_retryable_model_error(exc):
                     await asyncio.sleep(retry_delay_seconds)
                     continue
                 # Every dataset case must be represented in aggregate metrics.

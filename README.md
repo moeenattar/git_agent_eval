@@ -1,6 +1,6 @@
 # GitHub Issue Triage Evaluation Harness
 
-An evaluation-first GitHub issue triage service built with Python and Google ADK. It accepts only an issue `title` and `body`, then returns:
+An evaluation-first GitHub issue triage service built with Python and Google ADK. It can run with the native Gemini connector or with Groq through ADK's LiteLLM connector. It accepts only an issue `title` and `body`, then returns:
 
 ```json
 {
@@ -14,7 +14,8 @@ The service is intentionally small. The main artifact is the harness that compar
 
 ## Implemented scope
 
-- A single Google ADK `LlmAgent` with a Pydantic output contract
+- A single provider-portable Google ADK `LlmAgent` with a Pydantic output contract
+- Native Gemini and optional Groq/LiteLLM model support
 - A written triage and annotation policy
 - GitHub issue collection and dataset validation tools
 - Deterministic exact-match, macro-F1, escalation, and under-triage metrics
@@ -28,7 +29,7 @@ The checked-in 50-case dataset contains 40 real `python/pythondotorg` issues and
 
 ## Experiment results
 
-All results below use `gemini-3.5-flash-lite`. Normalized cost uses the standard paid-tier list prices retrieved on 2026-09-05: $0.30 per million input tokens and $2.50 per million output tokens. The model ID and prices come from the official [Gemini model catalog](https://ai.google.dev/gemini-api/docs/models?hl=en) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing).
+The completed results below use `gemini-3.5-flash-lite`. Normalized cost uses the standard paid-tier list prices retrieved on 2026-09-05: $0.30 per million input tokens and $2.50 per million output tokens. The model ID and prices come from the official [Gemini model catalog](https://ai.google.dev/gemini-api/docs/models?hl=en) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing).
 
 ### Calibration prompt comparison
 
@@ -49,6 +50,12 @@ Prompt v2 was then run once on all 35 held-out cases. It completed 35/35 calls w
 
 The test had no `high -> low` errors, but it did have two `high -> medium` security downgrades and four human-review false negatives. This means the candidate is useful as an assisted triage baseline, not ready for unsupervised routing. The held-out failures are documented without post-test tuning in [docs/golden_failure_analysis.md](docs/golden_failure_analysis.md); the complete run is in [artifacts/golden-flash-lite-v2](artifacts/golden-flash-lite-v2).
 
+### Milestone 4 status
+
+The prompt comparison on the golden set is complete. Holding `gemini-3.5-flash-lite` fixed, prompt v2 improved exact match from 48.6% to 54.3%, reduced human-review false negatives from 8 to 4, and reduced high-priority downgrades from 3 to 2. The +5.7 percentage-point exact-match delta was not statistically clear on 35 cases (paired bootstrap 95% CI: -11.4 to +20.0 points), so this is evidence of a safer prompt rather than a conclusive aggregate-quality win.
+
+The provider/model comparison is configured but not yet complete. The locked Groq candidates are `openai/gpt-oss-20b` for cost and `openai/gpt-oss-120b` for quality, both using prompt v2. No Groq golden-set results should be added until transmission of the public and synthetic evaluation records to Groq is explicitly approved.
+
 ## Setup
 
 Python 3.11–3.14 is supported.
@@ -59,13 +66,22 @@ source .venv/bin/activate
 python -m pip install -e '.[dev]'
 ```
 
-For Gemini Developer API access:
+Install the optional Groq connector when needed:
+
+```bash
+python -m pip install -e '.[dev,groq]'
+```
+
+The Groq extra pins `litellm==1.99.0`. Do not downgrade to LiteLLM `1.82.7` or `1.82.8`; Google ADK reports those releases in its [LiteLLM security advisory](https://google.github.io/adk-docs/agents/models/litellm/#litellm-model-connector-for-adk-agents).
+
+Configure one or both providers:
 
 ```bash
 export GOOGLE_API_KEY='...'
+export GROQ_API_KEY='...'
 ```
 
-Copy `.env.example` to `.env` if you prefer a local environment file. Do not commit secrets.
+Alternatively, copy `.env.example` to `.env`. The CLI loads that file automatically, and Git ignores it. Never commit or paste API keys into documentation, commands, experiment artifacts, or issue data.
 
 ## Triage one issue
 
@@ -75,13 +91,21 @@ triage issue \
   --body 'Started after the latest deployment. No workaround is available.'
 ```
 
-The default model and prompt can be changed without modifying source:
+The default is Gemini Flash-Lite with prompt v2. Select either provider without changing application code:
 
 ```bash
+# Google Gemini
 triage issue --model gemini-3.5-flash-lite --prompt prompts/triage_v2.txt \
   --title 'Broken link in the contributor guide' \
   --body 'The setup link returns 404.'
+
+# Groq GPT-OSS
+triage issue --model groq/openai/gpt-oss-20b --prompt prompts/triage_v2.txt \
+  --title 'Broken link in the contributor guide' \
+  --body 'The setup link returns 404.'
 ```
+
+Groq's `openai/gpt-oss-20b` and `openai/gpt-oss-120b` models support strict JSON Schema output. The connector excludes their separate reasoning field so the public service response remains exactly the three-field contract.
 
 ## Build and validate the dataset
 
@@ -106,6 +130,8 @@ See [docs/triage_policy.md](docs/triage_policy.md) before annotating and [docs/d
 
 ## Run an evaluation
 
+Gemini example:
+
 ```bash
 triage evaluate \
   --dataset datasets/golden_test.jsonl \
@@ -116,6 +142,21 @@ triage evaluate \
   --output-price-per-million 2.50 \
   --requests-per-minute 12
 ```
+
+Groq cost-model example:
+
+```bash
+triage evaluate \
+  --dataset datasets/golden_test.jsonl \
+  --experiment golden-groq-gpt-oss-20b-v2 \
+  --model groq/openai/gpt-oss-20b \
+  --prompt prompts/triage_v2.txt \
+  --input-price-per-million 0.075 \
+  --output-price-per-million 0.30 \
+  --requests-per-minute 6
+```
+
+For the quality arm, use `groq/openai/gpt-oss-120b` with $0.15 input and $0.60 output per million tokens. These Groq prices and free-tier limits were retrieved on 2026-09-05 from the official [model catalog](https://console.groq.com/docs/models) and [rate-limit table](https://console.groq.com/docs/rate-limits). Although the free tier permits 30 requests per minute and 1,000 requests per day for each candidate, its 8,000-token-per-minute limit is the practical bottleneck for this dataset; six requests per minute leaves useful headroom.
 
 Use the current provider list prices rather than `0` for a meaningful normalized production-cost comparison. Pricing is supplied at run time so historical experiments remain reproducible when vendor prices change.
 
@@ -128,18 +169,25 @@ Artifacts are written to `artifacts/<experiment>/`:
 - `report.md` — concise human-readable summary
 - `config.json` — frozen experiment configuration
 
-An experiment is not a promotion candidate if critical under-triage or human-review false negatives increase, even when aggregate accuracy improves.
+An experiment is not a promotion candidate if model errors, any high-priority downgrade, critical `high -> low` under-triage, or human-review false negatives increase, even when aggregate accuracy improves.
 
 Compare two runs evaluated on the identical case IDs:
 
 ```bash
 triage compare \
-  --baseline artifacts/flash-v1 \
-  --candidate artifacts/flash-v2 \
-  --output artifacts/flash-v1-vs-v2.json
+  --baseline artifacts/golden-flash-lite-v1 \
+  --candidate artifacts/golden-flash-lite-v2 \
+  --output artifacts/golden-prompt-v1-v2.json
 ```
 
-The comparison uses paired bootstrap resampling, reports the confidence interval for the exact-match delta and the cost multiplier, and applies the two safety gates. A promotion is recommended only for a statistically clear improvement with no safety regression; a human should still make the final cost/latency trade-off.
+The comparison uses paired bootstrap resampling, reports the confidence interval for the exact-match delta, cost multiplier, exact prediction agreement, and per-field agreement. A promotion is recommended only for a statistically clear improvement with no safety or reliability regression; a human should still make the final cost/latency trade-off.
+
+## Provider and data-safety notes
+
+- `--model` determines which provider receives the issue title and body. Gemini model IDs use Google's native connector; `groq/...` IDs use Groq through LiteLLM.
+- Both providers may be configured simultaneously, but each evaluation uses exactly one model and records that model ID in `config.json`.
+- The checked-in real cases are sourced from public GitHub issues, while synthetic cases may still describe security, credentials, availability, or customer-data scenarios. Obtain approval for the intended external provider before transmitting a frozen dataset.
+- Free-tier billing does not imply zero production cost. Reports use normalized list prices so configurations remain economically comparable.
 
 ## Local Phoenix tracing
 
@@ -169,7 +217,7 @@ ruff check .
 - The model sees title and body only.
 - Existing repository labels are weak sampling evidence, not gold truth.
 - Exact match across all three output fields is the primary metric.
-- Human-review false negatives and `high -> low` under-triage are explicit safety gates.
+- Human-review false negatives, any high-priority downgrade, and `high -> low` under-triage are explicit safety gates.
 - Free-tier billing does not make inference economically free; experiments report normalized list-price cost.
 - A small dataset yields wide uncertainty, so the report includes a bootstrap confidence interval and avoids overstating small improvements.
 
