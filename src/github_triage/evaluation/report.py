@@ -61,6 +61,6 @@ Dataset: `{config["dataset_path"]}`
 ## Interpretation
 
 This report is descriptive for one configuration. Promotion decisions require a paired comparison
-on the same frozen test cases. A candidate must not increase critical under-triage or human-review
-false negatives.
+on the same frozen test cases. A candidate must not increase model errors, high-priority
+downgrades, critical under-triage, or human-review false negatives.
 """

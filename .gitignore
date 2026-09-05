@@ -12,7 +12,8 @@ artifacts/*
 !artifacts/calibration-flash-lite-v2/
 !artifacts/calibration-flash-lite-v2/**
 !artifacts/calibration-v1-v2.json
-!artifacts/golden-flash-lite-v2/
-!artifacts/golden-flash-lite-v2/**
+!artifacts/golden-*/
+!artifacts/golden-*/**
+!artifacts/golden-*.json
 datasets/raw/*
 !datasets/raw/.gitkeep

@@ -29,7 +29,7 @@ The checked-in 50-case dataset contains 40 real `python/pythondotorg` issues and
 
 ## Experiment results
 
-The completed results below use `gemini-3.5-flash-lite`. Normalized cost uses the standard paid-tier list prices retrieved on 2026-09-05: $0.30 per million input tokens and $2.50 per million output tokens. The model ID and prices come from the official [Gemini model catalog](https://ai.google.dev/gemini-api/docs/models?hl=en) and [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing).
+Normalized cost uses standard paid-tier list prices retrieved on 2026-09-05. Model and pricing sources are the official [Gemini model catalog](https://ai.google.dev/gemini-api/docs/models?hl=en), [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing), and [Groq model catalog](https://console.groq.com/docs/models). Free-tier billing does not change the normalized comparison.
 
 ### Calibration prompt comparison
 
@@ -52,9 +52,19 @@ The test had no `high -> low` errors, but it did have two `high -> medium` secur
 
 ### Milestone 4 status
 
-The prompt comparison on the golden set is complete. Holding `gemini-3.5-flash-lite` fixed, prompt v2 improved exact match from 48.6% to 54.3%, reduced human-review false negatives from 8 to 4, and reduced high-priority downgrades from 3 to 2. The +5.7 percentage-point exact-match delta was not statistically clear on 35 cases (paired bootstrap 95% CI: -11.4 to +20.0 points), so this is evidence of a safer prompt rather than a conclusive aggregate-quality win.
+Milestone 4 is complete. Holding `gemini-3.5-flash-lite` fixed, prompt v2 improved exact match from 48.6% to 54.3%, reduced human-review false negatives from 8 to 4, and reduced high-priority downgrades from 3 to 2. The +5.7 percentage-point exact-match delta was not statistically clear on 35 cases (paired bootstrap 95% CI: -11.4 to +20.0 points), so this is evidence of a safer prompt rather than a conclusive aggregate-quality win.
 
-The provider/model comparison is configured but not yet complete. The locked Groq candidates are `openai/gpt-oss-20b` for cost and `openai/gpt-oss-120b` for quality, both using prompt v2. No Groq golden-set results should be added until transmission of the public and synthetic evaluation records to Groq is explicitly approved.
+The locked model comparison held prompt v2 and all 35 golden cases fixed:
+
+| Configuration | Exact match | Priority F1 | Human-review F1 | Human-review FN | High downgrades | Mean latency | Cost / 1K |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Gemini 3.5 Flash-Lite | 54.3% | 0.798 | 0.857 | 4 | 2 | 1.77 s | $0.3815 |
+| Groq GPT-OSS 20B | 42.9% | 0.575 | 0.702 | 9 | 1 | 0.94 s | $0.1575 |
+| Groq GPT-OSS 120B | 51.4% | 0.827 | 0.694 | 10 | 1 | 1.27 s | $0.3247 |
+
+Neither Groq model is promoted. The 20B candidate was 58.7% cheaper and faster than Gemini, but exact match fell 11.4 points and human-review false negatives rose from 4 to 9. The 120B candidate was 14.9% cheaper with comparable exact match, but false negatives rose from 4 to 10. Both therefore failed the human-review safety gate.
+
+The GPT-OSS 120B repeat produced the same 51.4% exact match and the same safety counts. Exact three-field agreement was 88.6%; issue-type and human-review agreement were 100%, while priority agreement was 88.6%. This is reasonably stable but does not reverse the safety rejection. The retained assisted baseline is Gemini 3.5 Flash-Lite with prompt v2. See [docs/milestone4_results.md](docs/milestone4_results.md) for paired intervals, agreement, and the decision record.
 
 ## Setup
 

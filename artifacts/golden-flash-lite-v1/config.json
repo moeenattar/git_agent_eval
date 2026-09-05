@@ -1,0 +1,18 @@
+{
+  "dataset_path": "datasets/golden_test.jsonl",
+  "dataset_sha256": "f86c67f69b36362e0d10d466a93847de4b8b64b7a106278f6a8d02ea02ea9017",
+  "dataset_versions": [
+    "v1"
+  ],
+  "experiment": "golden-flash-lite-v1",
+  "git_commit": "c57841af56db10fe4c2cce007f62334c0a93c3e8",
+  "git_worktree_dirty": true,
+  "input_price_per_million_usd": 0.3,
+  "max_attempts": 3,
+  "model": "gemini-3.5-flash-lite",
+  "output_price_per_million_usd": 2.5,
+  "prompt_path": "prompts/triage_v1.txt",
+  "prompt_sha256": "b06513f385ebfe0e41d829c841fa00858efb0a6df62361ff773561cc35d879fd",
+  "requests_per_minute": 12.0,
+  "retry_delay_seconds": 30.0
+}

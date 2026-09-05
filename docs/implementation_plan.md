@@ -39,17 +39,19 @@ Phoenix remained optional and was not required for the authoritative experiment 
 
 ## Milestone 4 Cost and quality comparison
 
-Status: next
+Status: complete — evaluated and decided on 2026-09-05
 
-- Compare prompt v1 and v2 while holding the model fixed.
-- Compare a cost-oriented and a quality-oriented model while holding prompt v2 fixed.
-- Repeat promising configurations to measure decision stability.
-- Use paired bootstrap differences when comparing configurations on the same test set.
-- Reject any candidate that increases critical under-triage or human-review false negatives.
+- [x] Compare prompt v1 and v2 while holding Gemini 3.5 Flash-Lite fixed.
+- [x] Compare Groq GPT-OSS 20B and 120B with Gemini while holding prompt v2 fixed.
+- [x] Repeat GPT-OSS 120B to measure exact and per-field decision stability.
+- [x] Use paired bootstrap differences on identical frozen test cases.
+- [x] Reject both Groq candidates because human-review false negatives increased.
+
+Decision: retain Gemini 3.5 Flash-Lite with prompt v2 as the assisted baseline. None of the evaluated configurations is approved for unsupervised routing.
 
 ## Milestone 5 Submission
 
-Status: pending
+Status: next
 
 - Add actual results and failure analysis to the README.
 - Document model IDs, prices and retrieval dates, dataset hashes, prompt hashes, and git commits.
