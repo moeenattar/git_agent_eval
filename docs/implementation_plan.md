@@ -47,7 +47,7 @@ Status: complete — evaluated and decided on 2026-09-05
 - [x] Use paired bootstrap differences on identical frozen test cases.
 - [x] Reject both Groq candidates because human-review false negatives increased.
 
-Decision: retain Gemini 3.5 Flash-Lite with prompt v2 as the assisted baseline. None of the evaluated configurations is approved for unsupervised routing.
+Decision: finalize prompt v2 and retain Gemini 3.5 Flash-Lite with v2 as the assisted baseline. None of the evaluated configurations is approved for unsupervised routing.
 
 ### Prompt optimization follow-up
 
@@ -57,8 +57,9 @@ Status: complete — evaluated and decided on 2026-09-06
 - [x] Reject v3 because it introduced a human-review false negative.
 - [x] Freeze v5 after it reached 86.7% calibration exact match with no safety violations.
 - [x] Run v5 once on the golden split and compare it with v2.
-- [x] Retain v2 because v5's +5.7-point exact-match delta was not statistically clear, human-review macro-F1 fell, and normalized cost increased 30.3%.
+- [x] Finalize v2 because v5's +5.7-point exact-match delta was not statistically clear, human-review macro-F1 fell, normalized cost increased 30.3%, and a GPT-OSS 120B attempt with the larger v5 prompt hit the provider rate limit.
 
+V3–v5 are rejected experiment history. No additional evaluation is needed for this decision.
 See `docs/prompt_optimization_results.md` for the complete decision record.
 
 ## Milestone 5 Submission

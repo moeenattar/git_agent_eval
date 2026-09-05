@@ -2,6 +2,8 @@
 
 The Phoenix integration complements the local evaluation harness. The checked-in prediction files, metrics, and reports remain the reproducible source of truth; Phoenix adds row-level exploration, task/evaluator traces, prompt registration, and filterable annotations.
 
+Prompt v2 is the final project prompt. Use `prompts/triage_v2.txt` for both replay metadata and live Phoenix comparisons; v3–v5 are retained only as rejected experiment history.
+
 ## Install and configure
 
 Install the Phoenix client together with the existing tracing and optional Groq integration:

@@ -5,6 +5,10 @@ Gemini models and both verified Groq GPT-OSS models. It then compares every cand
 with Gemini 3.5 Flash-Lite and publishes the saved predictions to Phoenix without making
 duplicate model calls.
 
+Prompt v2 is the final prompt for this project. Do not substitute v3, v4, or v5 in these
+commands. Those prompts are retained only as rejected experiment history; an attempted
+GPT-OSS 120B run with the larger v5 prompt hit the provider rate limit.
+
 Every `triage evaluate` or `triage phoenix --live` command sends all dataset inputs to the
 selected external provider. The checked-in cases are public or synthetic, but some describe
 security-sensitive scenarios. Confirm the provider is approved before running a command.

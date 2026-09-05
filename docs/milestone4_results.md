@@ -46,6 +46,6 @@ Four priority predictions changed, while issue type and human-review decisions w
 
 ## Decision
 
-Retain Gemini 3.5 Flash-Lite with prompt v2 as the assisted-triage baseline. Promote neither Groq model. No configuration is approved for autonomous routing because even the retained baseline missed four required human reviews and downgraded two high-priority security cases to medium.
+Finalize prompt v2 and retain Gemini 3.5 Flash-Lite with v2 as the assisted-triage baseline. Promote neither Groq model. No configuration is approved for autonomous routing because even the retained baseline missed four required human reviews and downgraded two high-priority security cases to medium. Later prompt experiments v3–v5 did not change this final decision.
 
 The complete prediction records, metrics, configs, and paired comparisons are stored under `artifacts/`. All completed runs contain 35 successful predictions and zero provider errors.

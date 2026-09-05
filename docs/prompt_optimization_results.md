@@ -11,12 +11,12 @@ prompt-v2 calibration disagreements. V3 improved exact match but introduced a hu
 false negative, so it was rejected. V4 restored the safety gate. V5 made one final general
 boundary refinement, after which prompt iteration stopped to limit overfitting.
 
-The selected v5 prompt was frozen before one evaluation on the 35-case golden split. No
-prompt rule or gold label was changed after seeing the v5 golden result.
+The calibration-selected v5 test candidate was frozen before one evaluation on the 35-case
+golden split. No prompt rule or gold label was changed after seeing the v5 golden result.
 
 ## Calibration results
 
-| Metric | v2 baseline | v3 | v4 | v5 selected |
+| Metric | v2 final | v3 | v4 | v5 test candidate |
 |---|---:|---:|---:|---:|
 | Exact match | 80.0% | 86.7% | 86.7% | 86.7% |
 | Type macro-F1 | 0.651 | 0.800 | 0.731 | 0.800 |
@@ -52,16 +52,26 @@ The paired exact-match delta was +5.7 percentage points with a 95% bootstrap int
 -11.4 to +22.9 points. Exact three-field prediction agreement between v2 and v5 was 65.7%;
 agreement for each individual field was 85.7%.
 
-## Decision
+## Operational follow-up
 
-Do not promote v5 as the default prompt. It improves the exact-match point estimate and
-reduces high-priority downgrades without increasing false negatives, but the accuracy gain
-is not statistically clear, human-review macro-F1 is lower, and normalized cost increases by
-30.3%. Prompt v2 remains the retained assisted-triage baseline; neither prompt is approved
-for unsupervised routing.
+A subsequent GPT-OSS 120B attempt with prompt v5 hit the provider rate limit. No additional
+evaluation was requested or performed. The v5 golden run used 49,627 input tokens versus
+36,152 for v2, a 37.3% increase. Provider-side accounting can differ, but the larger prompt
+clearly leaves less headroom under a token-per-minute quota.
 
-V5 is a useful candidate for reevaluation after expanding the independently annotated
-dataset. Do not tune another prompt against the v5 golden failures.
+## Final decision
+
+Prompt v2 is final. Do not promote v5 as the default prompt. It improves the exact-match
+point estimate and reduces high-priority downgrades without increasing false negatives, but
+the accuracy gain is not statistically clear, human-review macro-F1 is lower, and normalized
+cost increases by 30.3%. The GPT-OSS 120B rate-limit failure adds an operational reason to
+avoid the larger prompt. Use v2 for Gemini, Groq, local evaluation, Phoenix experiments, and
+ADK Web. Gemini 3.5 Flash-Lite with v2 remains the assisted-triage baseline; no configuration
+is approved for unsupervised routing.
+
+V3–v5 and their artifacts remain only as rejected experiment history. Do not tune another
+prompt against the v5 golden failures, and do not rerun the completed evaluation solely to
+confirm this decision.
 
 ## Artifacts
 

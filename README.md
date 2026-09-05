@@ -64,11 +64,11 @@ The locked model comparison held prompt v2 and all 35 golden cases fixed:
 
 Neither Groq model is promoted. The 20B candidate was 58.7% cheaper and faster than Gemini, but exact match fell 11.4 points and human-review false negatives rose from 4 to 9. The 120B candidate was 14.9% cheaper with comparable exact match, but false negatives rose from 4 to 10. Both therefore failed the human-review safety gate.
 
-The GPT-OSS 120B repeat produced the same 51.4% exact match and the same safety counts. Exact three-field agreement was 88.6%; issue-type and human-review agreement were 100%, while priority agreement was 88.6%. This is reasonably stable but does not reverse the safety rejection. The retained assisted baseline is Gemini 3.5 Flash-Lite with prompt v2. See [docs/milestone4_results.md](docs/milestone4_results.md) for paired intervals, agreement, and the decision record.
+The GPT-OSS 120B repeat produced the same 51.4% exact match and the same safety counts. Exact three-field agreement was 88.6%; issue-type and human-review agreement were 100%, while priority agreement was 88.6%. This is reasonably stable but does not reverse the safety rejection. The final configuration is prompt v2; Gemini 3.5 Flash-Lite with v2 remains the assisted baseline. See [docs/milestone4_results.md](docs/milestone4_results.md) for paired intervals, agreement, and the decision record.
 
 ### Prompt optimization follow-up
 
-A calibration-only v3–v5 iteration selected prompt v5 for one frozen golden run. Relative to v2, v5 increased exact match from 54.3% to 60.0% and reduced high-priority downgrades from two to one, while human-review false negatives remained at four and critical under-triage remained zero. The paired accuracy interval (-11.4 to +22.9 points) crossed zero, human-review macro-F1 fell from 0.857 to 0.771, and normalized cost increased 30.3%, so v5 was not promoted. Prompt v2 remains the assisted baseline. See [docs/prompt_optimization_results.md](docs/prompt_optimization_results.md) for the calibration protocol, full metrics, fingerprints, and decision.
+A calibration-only v3–v5 iteration advanced prompt v5 to one frozen golden run. Relative to v2, v5 increased exact match from 54.3% to 60.0% and reduced high-priority downgrades from two to one, while human-review false negatives remained at four and critical under-triage remained zero. The paired accuracy interval (-11.4 to +22.9 points) crossed zero, human-review macro-F1 fell from 0.857 to 0.771, and normalized cost increased 30.3%. A subsequent GPT-OSS 120B attempt with v5 also hit the provider rate limit; v5's larger input footprint adds pressure to the token-per-minute quota. V5 is rejected, and prompt v2 is the final prompt for all model comparisons. See [docs/prompt_optimization_results.md](docs/prompt_optimization_results.md) for the calibration protocol, full metrics, fingerprints, and final decision.
 
 ## Setup
 
@@ -171,7 +171,7 @@ Gemini example:
 ```bash
 triage evaluate \
   --dataset datasets/golden_test.jsonl \
-  --experiment golden-flash-lite-v2 \
+  --experiment eval-gemini-3-5-flash-lite-v2 \
   --model gemini-3.5-flash-lite \
   --prompt prompts/triage_v2.txt \
   --input-price-per-million 0.30 \
@@ -184,7 +184,7 @@ Groq cost-model example:
 ```bash
 triage evaluate \
   --dataset datasets/golden_test.jsonl \
-  --experiment golden-groq-gpt-oss-20b-v2 \
+  --experiment eval-groq-gpt-oss-20b-v2 \
   --model groq/openai/gpt-oss-20b \
   --prompt prompts/triage_v2.txt \
   --input-price-per-million 0.075 \
@@ -192,7 +192,7 @@ triage evaluate \
   --requests-per-minute 6
 ```
 
-For the quality arm, use `groq/openai/gpt-oss-120b` with $0.15 input and $0.60 output per million tokens. These Groq prices and free-tier limits were retrieved on 2026-09-05 from the official [model catalog](https://console.groq.com/docs/models) and [rate-limit table](https://console.groq.com/docs/rate-limits). Although the free tier permits 30 requests per minute and 1,000 requests per day for each candidate, its 8,000-token-per-minute limit is the practical bottleneck for this dataset; six requests per minute leaves useful headroom.
+For the quality arm, use `groq/openai/gpt-oss-120b` with $0.15 input and $0.60 output per million tokens. These Groq prices and free-tier limits were retrieved on 2026-09-05 from the official [model catalog](https://console.groq.com/docs/models) and [rate-limit table](https://console.groq.com/docs/rate-limits). Although the free tier permits 30 requests per minute and 1,000 requests per day for each candidate, its 8,000-token-per-minute limit is the practical bottleneck. Six requests per minute worked for the recorded prompt-v2 runs, but rolling usage and account limits can vary; reduce the value to four after an HTTP 429 response.
 
 Use the current provider list prices rather than `0` for a meaningful normalized production-cost comparison. Pricing is supplied at run time so historical experiments remain reproducible when vendor prices change.
 
@@ -213,7 +213,7 @@ Compare two runs evaluated on the identical case IDs:
 triage compare \
   --baseline artifacts/golden-flash-lite-v1 \
   --candidate artifacts/golden-flash-lite-v2 \
-  --output artifacts/golden-prompt-v1-v2.json
+  --output artifacts/comparisons/golden-prompt-v1-v2.json
 ```
 
 The comparison uses paired bootstrap resampling, reports the confidence interval for the exact-match delta, cost multiplier, exact prediction agreement, and per-field agreement. A promotion is recommended only for a statistically clear improvement with no safety or reliability regression; a human should still make the final cost/latency trade-off.
