@@ -115,7 +115,29 @@ triage issue --model groq/openai/gpt-oss-20b --prompt prompts/triage_v2.txt \
   --body 'The setup link returns 404.'
 ```
 
-Groq's `openai/gpt-oss-20b` and `openai/gpt-oss-120b` models support strict JSON Schema output. The connector excludes their separate reasoning field so the public service response remains exactly the three-field contract.
+The verified Groq allowlist is limited to `openai/gpt-oss-20b` and `openai/gpt-oss-120b` (written as `groq/openai/...` in this application's model setting). Other listed Groq chat, compound, prompt-guard, safeguard, and Qwen models are not accepted by this harness. The connector excludes GPT-OSS's separate reasoning field so the public service response remains exactly the three-field contract.
+
+## Triage interactively with ADK Web
+
+Start the local development UI from the repository root:
+
+```bash
+source .venv/bin/activate
+adk web --host 127.0.0.1 --port 8000 adk_apps
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), select `github_issue_triage`, and paste an issue as JSON into the message box:
+
+```json
+{
+  "title": "Broken link in the contributor guide",
+  "body": "The setup link returns 404."
+}
+```
+
+The app uses `TRIAGE_MODEL` and `TRIAGE_PROMPT_PATH` from `.env`, so either Gemini or Groq works without code changes. Restart ADK Web after changing those settings. When Phoenix is enabled, Web requests are also exported to the `github-triage` Phoenix project.
+
+ADK Web is an unauthenticated development tool. Keep it bound to `127.0.0.1`; do not expose it directly to a public or untrusted network. Use the CLI evaluation command—not ADK Web—for repeatable golden-dataset runs and promotion decisions.
 
 ## Build and validate the dataset
 
@@ -207,11 +229,37 @@ Install the optional integration and start Phoenix:
 python -m pip install -e '.[observability]'
 docker compose up phoenix
 export TRIAGE_ENABLE_PHOENIX=true
-export PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces
+export PHOENIX_BASE_URL=http://localhost:6006
+export TRIAGE_PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces
 triage issue --title '...' --body '...'
 ```
 
-Phoenix is the trace and experiment-debugging UI; files produced by the harness remain the source of truth for pass/fail decisions.
+Publish a saved golden run as a Phoenix dataset and fully scored experiment without making new model calls:
+
+```bash
+triage phoenix \
+  --dataset datasets/golden_test.jsonl \
+  --predictions artifacts/golden-groq-gpt-oss-20b-v2/predictions.jsonl \
+  --experiment-name golden-groq-20b-v2-phoenix-replay
+```
+
+This registers the frozen prompt, creates or reuses the fingerprinted dataset, traces every replayed task row, and attaches eight deterministic correctness/safety annotations per row. A separate `--live` mode runs fresh, fully traced Gemini or verified Groq calls. The selected provider must have its API key in the environment.
+
+Run Gemini live in Phoenix:
+
+```bash
+triage phoenix \
+  --live \
+  --dataset datasets/golden_test.jsonl \
+  --model gemini-3.5-flash-lite \
+  --prompt prompts/triage_v2.txt \
+  --requests-per-minute 6 \
+  --experiment-name golden-gemini-flash-lite-v2-live
+```
+
+Live mode sends every dataset input to the selected external provider. Use it only after approving that provider and dataset combination. Gemini IDs must begin with `gemini-`; Groq remains restricted to the two verified GPT-OSS models.
+
+Browse Phoenix at [http://localhost:6006](http://localhost:6006). See [docs/phoenix_experiments.md](docs/phoenix_experiments.md) for exact setup, live-run commands, evaluator score semantics, and the verified local parity result. Files produced by the harness remain the source of truth for pass/fail decisions.
 
 ## Test
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from google.adk.agents import LlmAgent
 from google.genai import types
 
+from github_triage.config import SUPPORTED_GROQ_MODELS
 from github_triage.models import AgentTriageDecision, IssueInput
 
 
@@ -20,6 +21,11 @@ def resolve_model(model: str):
 
     if not model.startswith("groq/"):
         return model
+    if model not in SUPPORTED_GROQ_MODELS:
+        supported = ", ".join(sorted(SUPPORTED_GROQ_MODELS))
+        raise ValueError(
+            f"unsupported Groq model for strict triage output: {model!r}; use one of: {supported}"
+        )
     try:
         from google.adk.models.lite_llm import LiteLlm
     except ImportError as exc:

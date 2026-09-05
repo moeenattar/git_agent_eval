@@ -6,6 +6,13 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+SUPPORTED_GROQ_MODELS = frozenset(
+    {
+        "groq/openai/gpt-oss-20b",
+        "groq/openai/gpt-oss-120b",
+    }
+)
+
 
 @dataclass(frozen=True)
 class AgentConfig:

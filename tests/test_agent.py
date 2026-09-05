@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from github_triage.agent import build_agent, load_prompt, resolve_model
 from github_triage.models import AgentTriageDecision
 
@@ -27,3 +29,8 @@ def test_groq_model_excludes_reasoning_from_structured_response() -> None:
 
     assert model.model == "groq/openai/gpt-oss-20b"
     assert model._additional_args["include_reasoning"] is False
+
+
+def test_unverified_groq_model_is_rejected_before_api_call() -> None:
+    with pytest.raises(ValueError, match="unsupported Groq model"):
+        resolve_model("groq/qwen/qwen3.6-27b")

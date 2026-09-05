@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import hashlib
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -125,6 +126,45 @@ async def _compare(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _phoenix(args: argparse.Namespace) -> int:
+    from github_triage.phoenix_integration import (
+        run_live_experiment,
+        run_replay_experiment,
+    )
+
+    if args.live:
+        defaults = AgentConfig.from_env()
+        model = args.model or defaults.model
+        prompt = args.prompt or defaults.prompt_path
+        summary = await run_live_experiment(
+            dataset_path=args.dataset,
+            model=model,
+            prompt_path=prompt,
+            phoenix_url=args.phoenix_url,
+            dataset_name=args.dataset_name,
+            experiment_name=args.experiment_name,
+            output_path=args.output,
+            requests_per_minute=args.requests_per_minute,
+            timeout=args.timeout,
+        )
+    else:
+        summary = run_replay_experiment(
+            dataset_path=args.dataset,
+            predictions_path=args.predictions,
+            phoenix_url=args.phoenix_url,
+            dataset_name=args.dataset_name,
+            experiment_name=args.experiment_name,
+            output_path=args.output,
+            timeout=args.timeout,
+        )
+    print(json.dumps(summary, indent=2))
+    print(
+        f"\nPhoenix experiment: {args.phoenix_url}/datasets/"
+        f"{summary['dataset_id']}/compare?experimentId={summary['experiment_id']}"
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="triage")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -158,6 +198,28 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--candidate", type=Path, required=True)
     compare.add_argument("--output", type=Path, required=True)
     compare.set_defaults(handler=_compare)
+
+    phoenix = subparsers.add_parser(
+        "phoenix", help="publish a frozen evaluation as a Phoenix dataset and experiment"
+    )
+    phoenix.add_argument("--dataset", type=Path, default=Path("datasets/golden_test.jsonl"))
+    mode = phoenix.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--predictions", type=Path, help="replay a saved predictions.jsonl")
+    mode.add_argument(
+        "--live", action="store_true", help="run fresh Gemini or verified Groq calls"
+    )
+    phoenix.add_argument("--model", help="live Gemini or Groq model; defaults to TRIAGE_MODEL")
+    phoenix.add_argument("--prompt", type=Path, help="live prompt; defaults to TRIAGE_PROMPT_PATH")
+    phoenix.add_argument(
+        "--phoenix-url",
+        default=os.getenv("PHOENIX_BASE_URL", "http://localhost:6006").rstrip("/"),
+    )
+    phoenix.add_argument("--dataset-name")
+    phoenix.add_argument("--experiment-name")
+    phoenix.add_argument("--requests-per-minute", type=float, default=6)
+    phoenix.add_argument("--timeout", type=int, default=120)
+    phoenix.add_argument("--output", type=Path)
+    phoenix.set_defaults(handler=_phoenix)
     return parser
 
 
