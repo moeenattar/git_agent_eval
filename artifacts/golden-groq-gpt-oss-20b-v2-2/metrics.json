@@ -1,0 +1,80 @@
+{
+  "case_count": 35,
+  "confusion": {
+    "human_review": {
+      "False": {
+        "False": 16,
+        "True": 1
+      },
+      "True": {
+        "False": 8,
+        "True": 10
+      }
+    },
+    "issue_type": {
+      "bug": {
+        "bug": 16
+      },
+      "documentation": {
+        "bug": 3,
+        "documentation": 1
+      },
+      "enhancement": {
+        "enhancement": 6,
+        "other": 1
+      },
+      "maintenance": {
+        "bug": 2,
+        "enhancement": 2,
+        "maintenance": 3
+      },
+      "other": {
+        "other": 1
+      }
+    },
+    "priority": {
+      "high": {
+        "high": 7,
+        "medium": 1
+      },
+      "low": {
+        "high": 1,
+        "low": 5,
+        "medium": 4
+      },
+      "medium": {
+        "high": 6,
+        "low": 3,
+        "medium": 8
+      }
+    }
+  },
+  "critical_under_triage_count": 0,
+  "errors": 0,
+  "estimated_cost_usd": {
+    "cases_with_cost": 35,
+    "per_1000_issues": 0.15472285714285713,
+    "total": 0.0054153
+  },
+  "exact_match_accuracy": 0.42857142857142855,
+  "exact_match_bootstrap_95_ci": [
+    0.2571428571428571,
+    0.6
+  ],
+  "high_priority_downgrades_count": 1,
+  "human_review_false_negative_rate": 0.4444444444444444,
+  "human_review_false_negatives": 8,
+  "human_review_macro_f1": 0.7350714886459209,
+  "latency_ms": {
+    "mean": 1003.3956022570886,
+    "p95": 1350.395725000271
+  },
+  "priority_macro_f1": 0.5750841750841751,
+  "successful_predictions": 35,
+  "type_macro_f1": 0.6663063063063063,
+  "usage": {
+    "cases_with_usage": 35,
+    "input_tokens": 42192,
+    "output_tokens": 7503
+  }
+}

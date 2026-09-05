@@ -16,7 +16,13 @@ def configure_phoenix_from_env() -> Any | None:
             "install with: pip install -e '.[observability]'"
         ) from exc
 
+    endpoint = os.getenv(
+        "TRIAGE_PHOENIX_COLLECTOR_ENDPOINT",
+        os.getenv("PHOENIX_COLLECTOR_ENDPOINT", "http://localhost:6006/v1/traces"),
+    )
     return register(
+        endpoint=endpoint,
         project_name=os.getenv("PHOENIX_PROJECT_NAME", "github-triage"),
+        protocol="http/protobuf",
         auto_instrument=True,
     )

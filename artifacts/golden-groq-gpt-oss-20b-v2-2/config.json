@@ -1,0 +1,18 @@
+{
+  "dataset_path": "datasets/golden_test.jsonl",
+  "dataset_sha256": "f86c67f69b36362e0d10d466a93847de4b8b64b7a106278f6a8d02ea02ea9017",
+  "dataset_versions": [
+    "v1"
+  ],
+  "experiment": "golden-groq-gpt-oss-20b-v2-2",
+  "git_commit": "d35cd7d33454b9f0177bd70d2ca5ee545c0cb62d",
+  "git_worktree_dirty": true,
+  "input_price_per_million_usd": 0.075,
+  "max_attempts": 3,
+  "model": "groq/openai/gpt-oss-20b",
+  "output_price_per_million_usd": 0.3,
+  "prompt_path": "prompts/triage_v2.txt",
+  "prompt_sha256": "e57dff9975bdd5a914d6c37b68f484eaaca5f2502ae4ae15d251ba9a8d7d0480",
+  "requests_per_minute": 6.0,
+  "retry_delay_seconds": 30
+}
