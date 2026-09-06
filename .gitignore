@@ -25,5 +25,9 @@ artifacts/*
 !artifacts/golden-*/
 !artifacts/golden-*/**
 !artifacts/golden-*.json
+!artifacts/eval-gemini-*/
+!artifacts/eval-gemini-*/**
+!artifacts/comparisons/
+!artifacts/comparisons/**
 datasets/raw/*
 !datasets/raw/.gitkeep

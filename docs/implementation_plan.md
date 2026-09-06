@@ -59,22 +59,24 @@ Status: complete — evaluated and decided on 2026-09-06
 - [x] Run v5 once on the golden split and compare it with v2.
 - [x] Finalize v2 because v5's +5.7-point exact-match delta was not statistically clear, human-review macro-F1 fell, normalized cost increased 30.3%, and a GPT-OSS 120B attempt with the larger v5 prompt hit the provider rate limit.
 
-V3–v5 are rejected experiment history. No additional evaluation is needed for this decision.
+V3–v5 are rejected experiment history. Later owner-run Gemini verification did not change
+this decision; no further evaluation is needed for prompt selection.
 See `docs/prompt_optimization_results.md` for the complete decision record.
 
 ## Milestone 5 Submission
 
-Status: complete — submission record prepared and release audit completed on 2026-09-06
+Status: complete — reproducibility details and release audit completed on 2026-09-06
 
 - [x] Add actual results and failure analysis to the README.
 - [x] Document model IDs, historical prices and retrieval dates, dataset hashes, prompt hashes, and git commits.
 - [x] Scan all reachable Git history and the frozen dataset for known secrets and private-data indicators.
 - [x] Verify the GitHub repository is public after the release audit.
-- [x] Publish a curated, secret-free export of the planning rationale instead of the raw conversation.
+- [x] Capture the planning rationale in the repository's implementation, policy, assumptions, and decision records without publishing the raw conversation.
 
-See `docs/submission_record.md` for the reproducibility ledger, experiment-to-commit map,
-release/privacy audit, and reasoning trail. Milestone 5 did not require new model calls or
-change the Milestone 4 selection decision.
+The README contains the compact reproducibility and release-audit record; experiment
+configuration files contain their exact model, pricing, input-hash, and Git provenance.
+Milestone 5 documentation did not itself require model calls. Later owner-run verification
+did not change the Milestone 4 selection decision.
 
 ## Deliberately deferred
 

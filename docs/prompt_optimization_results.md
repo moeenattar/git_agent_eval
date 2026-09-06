@@ -55,9 +55,25 @@ agreement for each individual field was 85.7%.
 ## Operational follow-up
 
 A subsequent GPT-OSS 120B attempt with prompt v5 hit the provider rate limit. No additional
-evaluation was requested or performed. The v5 golden run used 49,627 input tokens versus
-36,152 for v2, a 37.3% increase. Provider-side accounting can differ, but the larger prompt
-clearly leaves less headroom under a token-per-minute quota.
+Groq evaluation was completed. The v5 golden run used 49,627 input tokens versus 36,152 for v2,
+a 37.3% increase. Provider-side accounting can differ, but the larger prompt clearly leaves
+less headroom under a token-per-minute quota.
+
+## Additional owner-run verification
+
+On 2026-09-06, the owner independently ran v2 and v5 again on Flash-Lite and also ran both
+prompts on Gemini 3.8 Flash. This was treated as post-decision robustness evidence, not a new
+prompt-tuning round.
+
+| Model | v2 exact | v5 exact | Paired delta 95% CI | v2 / v5 human FN | v5 cost multiplier |
+|---|---:|---:|---:|---:|---:|
+| Gemini 3.5 Flash-Lite | 54.3% | 57.1% | -14.3 to +20.0 points | 5 / 3 | 1.304x |
+| Gemini 3.8 Flash | 54.3% | 54.3% | -14.3 to +14.3 points | 3 / 2 | 1.336x |
+
+V5 passed the safety non-regression checks in both paired repeats, but neither exact-match
+interval excluded zero. Human-review macro-F1 also fell from 0.827 to 0.770 on Flash-Lite
+and from 0.770 to 0.735 on Gemini 3.8. The additional evidence therefore does not justify
+the higher cost or reopen the frozen prompt decision.
 
 ## Final decision
 
@@ -70,8 +86,8 @@ ADK Web. Gemini 3.5 Flash-Lite with v2 remains the assisted-triage baseline; no 
 is approved for unsupervised routing.
 
 V3–v5 and their artifacts remain only as rejected experiment history. Do not tune another
-prompt against the v5 golden failures, and do not rerun the completed evaluation solely to
-confirm this decision.
+prompt against the v5 golden failures or run further evaluations solely to confirm this
+decision.
 
 ## Artifacts
 
@@ -81,6 +97,12 @@ confirm this decision.
 - `artifacts/calibration-prompt-v2-v5.json`
 - `artifacts/golden-flash-lite-v5/`
 - `artifacts/golden-prompt-v2-v5.json`
+- `artifacts/eval-gemini-3-5-flash-lite-v2/`
+- `artifacts/eval-gemini-3-5-flash-lite-v5/`
+- `artifacts/eval-gemini-3-8-flash-v2/`
+- `artifacts/eval-gemini-3-8-flash-v5/`
+- `artifacts/comparisons/gemini-3-5-lite-v2-vs-v5.json`
+- `artifacts/comparisons/gemini-3-8-flash-v2-vs-v5.json`
 
 Prompt fingerprints:
 

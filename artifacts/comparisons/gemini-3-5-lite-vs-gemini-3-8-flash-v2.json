@@ -1,0 +1,30 @@
+{
+  "baseline_cost_per_1000_usd": 0.38151714285714283,
+  "baseline_critical_under_triage": 0,
+  "baseline_errors": 0,
+  "baseline_exact_match_accuracy": 0.5428571428571428,
+  "baseline_high_priority_downgrades": 2,
+  "baseline_human_review_false_negatives": 5,
+  "candidate_cost_per_1000_usd": 0.87765,
+  "candidate_critical_under_triage": 0,
+  "candidate_errors": 0,
+  "candidate_exact_match_accuracy": 0.5428571428571428,
+  "candidate_high_priority_downgrades": 0,
+  "candidate_human_review_false_negatives": 3,
+  "case_count": 35,
+  "cost_multiplier": 2.300420876051254,
+  "exact_match_accuracy_delta": 0.0,
+  "field_agreement": {
+    "issue_type": 0.8,
+    "needs_human_review": 0.8285714285714286,
+    "priority": 0.7428571428571429
+  },
+  "paired_bootstrap_delta_95_ci": [
+    -0.2,
+    0.2
+  ],
+  "prediction_agreement_rate": 0.5714285714285714,
+  "promotion_recommended": false,
+  "safety_gates_pass": true,
+  "statistically_clear_improvement": false
+}

@@ -1,6 +1,9 @@
 # Golden Test Failure Analysis
 
-This analysis describes the first and only completed golden-set run of the selected configuration: `gemini-3.5-flash-lite` with `prompts/triage_v2.txt`. The 35-case frozen split and prompt were not changed after these results were observed.
+This analysis describes the authoritative selection run of `gemini-3.5-flash-lite` with
+`prompts/triage_v2.txt`. The 35-case frozen split and prompt were not changed after these
+results were observed. A later owner-run repeat is documented separately in
+`docs/milestone4_results.md`; it does not alter this original failure analysis.
 
 ## Outcome
 

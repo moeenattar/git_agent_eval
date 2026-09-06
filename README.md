@@ -33,71 +33,83 @@ Normalized cost uses standard paid-tier list prices retrieved on 2026-09-05. Mod
 
 ### Calibration prompt comparison
 
-| Metric | Prompt v1 | Prompt v2 |
-|---|---:|---:|
-| Cases completed | 15/15 | 15/15 |
-| Exact match | 53.3% | 80.0% |
-| Exact-match 95% bootstrap CI | 26.7%–80.0% | 60.0%–100.0% |
-| Human-review false negatives | 4 | 0 |
-| Critical high-to-low errors | 1 | 0 |
-| Normalized cost / 1,000 issues | $0.3025 | $0.3882 |
+All five prompt versions were calibrated with `gemini-3.5-flash-lite` on the same 15 cases.
 
-The paired exact-match improvement was +26.7 percentage points with a 95% bootstrap interval of +6.7 to +53.3 points. Prompt v2 passed both safety gates at 1.28× the normalized cost, so it was selected before opening the golden split. See [the paired comparison](artifacts/calibration-v1-v2.json).
+| Metric | Prompt v1 | Prompt v2 | Prompt v3 | Prompt v4 | Prompt v5 |
+|---|---:|---:|---:|---:|---:|
+| Cases completed | 15/15 | 15/15 | 15/15 | 15/15 | 15/15 |
+| Exact match | 53.3% | 80.0% | 86.7% | 86.7% | 86.7% |
+| Exact-match 95% bootstrap CI | 26.7%–80.0% | 60.0%–100.0% | 66.7%–100.0% | 66.7%–100.0% | 66.7%–100.0% |
+| Type macro-F1 | 0.703 | 0.651 | 0.800 | 0.731 | 0.800 |
+| Priority macro-F1 | 0.687 | 0.937 | 0.930 | 0.930 | 0.878 |
+| Human-review macro-F1 | 0.700 | 1.000 | 0.932 | 1.000 | 1.000 |
+| Human-review false negatives | 4 | 0 | 1 | 0 | 0 |
+| Critical high-to-low errors | 1 | 0 | 0 | 0 | 0 |
+| Normalized cost / 1,000 issues | $0.3025 | $0.3882 | $0.4482 | $0.4738 | $0.4982 |
 
-### Frozen golden test
+Prompt v2 passed both safety gates and was selected before the golden split was opened. V3–v5 were later calibration-only refinements; their held-out results did not justify replacing v2. See [the v1–v2 paired comparison](artifacts/calibration-v1-v2.json) and [the prompt optimization record](docs/prompt_optimization_results.md) for the selection details.
 
-Prompt v2 was then run once on all 35 held-out cases. It completed 35/35 calls with no model errors and achieved 54.3% exact match (95% bootstrap CI 37.1%–71.4%), type macro-F1 0.742, priority macro-F1 0.798, and human-review macro-F1 0.857. Normalized cost was $0.3815 per 1,000 issues; mean latency was 1.77 seconds and p95 was 2.18 seconds.
+### Evaluation Dataset Results
 
-The test had no `high -> low` errors, but it did have two `high -> medium` security downgrades and four human-review false negatives. This means the candidate is useful as an assisted triage baseline, not ready for unsupervised routing. The held-out failures are documented without post-test tuning in [docs/golden_failure_analysis.md](docs/golden_failure_analysis.md); the complete run is in [artifacts/golden-flash-lite-v2](artifacts/golden-flash-lite-v2).
+The table below consolidates every complete saved run on the frozen 35-case golden split. Each run completed 35/35 predictions with no provider errors; repeated configurations are shown separately because their outputs can vary between calls.
 
-### Milestone 4 status
+| Run | Model + prompt | Exact match | Type F1 | Priority F1 | Human F1 | Human FN | High downgrades | Mean / p95 latency | Cost / 1K |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| [Initial prompt comparison](artifacts/golden-flash-lite-v1) | Gemini 3.5 Flash-Lite + v1 | 48.6% | 0.748 | 0.791 | 0.735 | 8 | 3 | 1.43 / 1.79 s | $0.3013 |
+| [Selected baseline](artifacts/golden-flash-lite-v2) | Gemini 3.5 Flash-Lite + v2 | 54.3% | 0.742 | 0.798 | 0.857 | 4 | 2 | 1.77 / 2.18 s | $0.3815 |
+| [Model comparison](artifacts/golden-groq-gpt-oss-20b-v2) | Groq GPT-OSS 20B + v2 | 42.9% | 0.666 | 0.575 | 0.702 | 9 | 1 | 0.94 / 1.33 s | $0.1575 |
+| [Model comparison, run 2](artifacts/golden-groq-gpt-oss-20b-v2-2) | Groq GPT-OSS 20B + v2 | 42.9% | 0.666 | 0.575 | 0.735 | 8 | 1 | 1.00 / 1.35 s | $0.1547 |
+| [Model comparison](artifacts/golden-groq-gpt-oss-120b-v2) | Groq GPT-OSS 120B + v2 | 51.4% | 0.761 | 0.827 | 0.694 | 10 | 1 | 1.27 / 1.99 s | $0.3247 |
+| [Stability repeat](artifacts/golden-groq-gpt-oss-120b-v2-repeat) | Groq GPT-OSS 120B + v2 | 51.4% | 0.761 | 0.769 | 0.694 | 10 | 1 | 1.32 / 2.10 s | $0.3322 |
+| [Prompt candidate](artifacts/golden-flash-lite-v5) | Gemini 3.5 Flash-Lite + v5 | 60.0% | 0.863 | 0.822 | 0.771 | 4 | 1 | 1.40 / 1.66 s | $0.4969 |
+| [Owner verification](artifacts/eval-gemini-3-5-flash-lite-v2) | Gemini 3.5 Flash-Lite + v2 | 54.3% | 0.742 | 0.824 | 0.827 | 5 | 2 | 1.37 / 1.63 s | $0.3815 |
+| [Owner verification](artifacts/eval-gemini-3-5-flash-lite-v5) | Gemini 3.5 Flash-Lite + v5 | 57.1% | 0.832 | 0.827 | 0.770 | 3 | 1 | 1.35 / 1.69 s | $0.4976 |
+| [Owner verification](artifacts/eval-gemini-3-8-flash-v2) | Gemini 3.8 Flash + v2 | 54.3% | 0.935 | 0.750 | 0.770 | 3 | 0 | 5.66 / 10.36 s | $0.8777 |
+| [Owner verification](artifacts/eval-gemini-3-8-flash-v5) | Gemini 3.8 Flash + v5 | 54.3% | 0.950 | 0.775 | 0.735 | 2 | 0 | 5.46 / 11.29 s | $1.1726 |
 
-Milestone 4 is complete. Holding `gemini-3.5-flash-lite` fixed, prompt v2 improved exact match from 48.6% to 54.3%, reduced human-review false negatives from 8 to 4, and reduced high-priority downgrades from 3 to 2. The +5.7 percentage-point exact-match delta was not statistically clear on 35 cases (paired bootstrap 95% CI: -11.4 to +20.0 points), so this is evidence of a safer prompt rather than a conclusive aggregate-quality win.
+Prompt v2 improved the initial Flash-Lite run's safety profile, but its +5.7-point exact-match gain was not statistically clear (paired 95% bootstrap CI: -11.4 to +20.0 points). Prompt v5 likewise produced no statistically clear held-out gain, lowered human-review macro-F1, and cost about 30% more than v2. The Groq candidates missed substantially more required human reviews, while Gemini 3.8 did not improve exact match and cost more.
 
-The locked model comparison held prompt v2 and all 35 golden cases fixed:
+Prompt v2 with Gemini 3.5 Flash-Lite therefore remains the cost-oriented assisted-triage baseline. No configuration is approved for unsupervised routing. See [the complete evaluation analysis](docs/milestone4_results.md) and [held-out failure analysis](docs/golden_failure_analysis.md) for paired intervals, stability measurements, and the decision record.
 
-| Configuration | Exact match | Priority F1 | Human-review F1 | Human-review FN | High downgrades | Mean latency | Cost / 1K |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Gemini 3.5 Flash-Lite | 54.3% | 0.798 | 0.857 | 4 | 2 | 1.77 s | $0.3815 |
-| Groq GPT-OSS 20B | 42.9% | 0.575 | 0.702 | 9 | 1 | 0.94 s | $0.1575 |
-| Groq GPT-OSS 120B | 51.4% | 0.827 | 0.694 | 10 | 1 | 1.27 s | $0.3247 |
+## Quick start
 
-Neither Groq model is promoted. The 20B candidate was 58.7% cheaper and faster than Gemini, but exact match fell 11.4 points and human-review false negatives rose from 4 to 9. The 120B candidate was 14.9% cheaper with comparable exact match, but false negatives rose from 4 to 10. Both therefore failed the human-review safety gate.
+### Prerequisites
 
-The GPT-OSS 120B repeat produced the same 51.4% exact match and the same safety counts. Exact three-field agreement was 88.6%; issue-type and human-review agreement were 100%, while priority agreement was 88.6%. This is reasonably stable but does not reverse the safety rejection. The final configuration is prompt v2; Gemini 3.5 Flash-Lite with v2 remains the assisted baseline. See [docs/milestone4_results.md](docs/milestone4_results.md) for paired intervals, agreement, and the decision record.
+- Git and Python 3.11–3.14
+- A Gemini Developer API key, or a Groq API key for the optional Groq connector
+- Docker with Compose only if you want local Phoenix tracing
 
-### Prompt optimization follow-up
+Run the remaining commands from the repository root so the default prompt and dataset paths resolve correctly.
 
-A calibration-only v3–v5 iteration advanced prompt v5 to one frozen golden run. Relative to v2, v5 increased exact match from 54.3% to 60.0% and reduced high-priority downgrades from two to one, while human-review false negatives remained at four and critical under-triage remained zero. The paired accuracy interval (-11.4 to +22.9 points) crossed zero, human-review macro-F1 fell from 0.857 to 0.771, and normalized cost increased 30.3%. A subsequent GPT-OSS 120B attempt with v5 also hit the provider rate limit; v5's larger input footprint adds pressure to the token-per-minute quota. V5 is rejected, and prompt v2 is the final prompt for all model comparisons. See [docs/prompt_optimization_results.md](docs/prompt_optimization_results.md) for the calibration protocol, full metrics, fingerprints, and final decision.
-
-## Setup
-
-Python 3.11–3.14 is supported.
+### 1. Clone and install
 
 ```bash
-python -m venv .venv
+git clone https://github.com/moeenattar/git_agent_eval.git
+cd git_agent_eval
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 ```
 
-Install the optional Groq connector when needed:
+On Windows PowerShell, activate the environment with `.venv\Scripts\Activate.ps1`. Activate the environment again whenever you open a new shell in the project.
+
+### 2. Configure Gemini
+
+Copy the checked-in template, then edit `.env` and add your key:
 
 ```bash
-python -m pip install -e '.[dev,groq]'
+cp .env.example .env
 ```
 
-The Groq extra pins `litellm==1.99.0`. Do not downgrade to LiteLLM `1.82.7` or `1.82.8`; Google ADK reports those releases in its [LiteLLM security advisory](https://google.github.io/adk-docs/agents/models/litellm/#litellm-model-connector-for-adk-agents).
-
-Configure one or both providers:
-
-```bash
-export GOOGLE_API_KEY='...'
-export GROQ_API_KEY='...'
+```dotenv
+GOOGLE_API_KEY=your-gemini-api-key
+TRIAGE_MODEL=gemini-3.5-flash-lite
+TRIAGE_PROMPT_PATH=prompts/triage_v2.txt
 ```
 
-Alternatively, copy `.env.example` to `.env`. The CLI loads that file automatically, and Git ignores it. Never commit or paste API keys into documentation, commands, experiment artifacts, or issue data.
+`GEMINI_API_KEY` is also accepted by the Gemini SDK. The CLI loads `.env` automatically, and Git ignores it. Never commit or paste real keys into commands, documentation, artifacts, or issue data.
 
-## Triage one issue
+### 3. Triage your first issue
 
 ```bash
 triage issue \
@@ -105,32 +117,91 @@ triage issue \
   --body 'Started after the latest deployment. No workaround is available.'
 ```
 
-The default is Gemini Flash-Lite with prompt v2. Select either provider without changing application code:
+The command prints a JSON triage decision plus latency and token-usage metadata.
+
+### Use Groq instead
+
+Install the optional connector and set the Groq model in `.env`:
 
 ```bash
-# Google Gemini
-triage issue --model gemini-3.5-flash-lite --prompt prompts/triage_v2.txt \
-  --title 'Broken link in the contributor guide' \
-  --body 'The setup link returns 404.'
-
-# Groq GPT-OSS
-triage issue --model groq/openai/gpt-oss-20b --prompt prompts/triage_v2.txt \
-  --title 'Broken link in the contributor guide' \
-  --body 'The setup link returns 404.'
+python -m pip install -e '.[dev,groq]'
 ```
 
-The verified Groq allowlist is limited to `openai/gpt-oss-20b` and `openai/gpt-oss-120b` (written as `groq/openai/...` in this application's model setting). Other listed Groq chat, compound, prompt-guard, safeguard, and Qwen models are not accepted by this harness. The connector excludes GPT-OSS's separate reasoning field so the public service response remains exactly the three-field contract.
+```dotenv
+GROQ_API_KEY=your-groq-api-key
+TRIAGE_MODEL=groq/openai/gpt-oss-20b
+TRIAGE_PROMPT_PATH=prompts/triage_v2.txt
+```
 
-## Triage interactively with ADK Web
+The verified Groq models are `groq/openai/gpt-oss-20b` and `groq/openai/gpt-oss-120b`. You can also override `.env` for one call with `--model` and `--prompt`. The Groq extra pins `litellm==1.99.0`; do not downgrade to versions `1.82.7` or `1.82.8` listed in Google ADK's [LiteLLM security advisory](https://google.github.io/adk-docs/agents/models/litellm/#litellm-model-connector-for-adk-agents).
 
-Start the local development UI from the repository root:
+## Run local checks
+
+These commands do not call a model or require an API key:
 
 ```bash
-source .venv/bin/activate
+python scripts/validate_dataset.py datasets/calibration.jsonl datasets/golden_test.jsonl
+pytest
+ruff check .
+```
+
+## Run the evaluation harness
+
+An evaluation sends every selected dataset row to the configured external provider. Confirm that the provider and dataset are approved before running it. This Gemini example creates a new `artifacts/local-gemini-v2/` directory:
+
+```bash
+triage evaluate \
+  --dataset datasets/golden_test.jsonl \
+  --experiment local-gemini-v2 \
+  --model gemini-3.5-flash-lite \
+  --prompt prompts/triage_v2.txt \
+  --input-price-per-million 0.30 \
+  --output-price-per-million 2.50 \
+  --requests-per-minute 12
+```
+
+For Groq GPT-OSS 20B, install the `groq` extra first and use:
+
+```bash
+triage evaluate \
+  --dataset datasets/golden_test.jsonl \
+  --experiment local-groq-20b-v2 \
+  --model groq/openai/gpt-oss-20b \
+  --prompt prompts/triage_v2.txt \
+  --input-price-per-million 0.075 \
+  --output-price-per-million 0.30 \
+  --requests-per-minute 6
+```
+
+The example prices are the historical list prices used by this repository on 2026-09-05. Check the current [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing) or [Groq model catalog](https://console.groq.com/docs/models) before recording a new comparison. Use list prices rather than zero even when a call is covered by a free tier. Lower `--requests-per-minute` if your account returns HTTP 429; retries default to three attempts with a 30-second delay.
+
+Experiment names must be unique because the harness will not overwrite an existing artifact directory. Every successful run writes:
+
+- `predictions.jsonl` with per-case outputs, usage, latency, and errors
+- `metrics.json` with aggregate quality, safety, latency, and normalized cost
+- `report.md` with a readable summary
+- `config.json` with model, prompt, dataset, pricing, content hashes, and Git state
+
+Compare two saved runs that contain identical case IDs without making more model calls:
+
+```bash
+triage compare \
+  --baseline artifacts/golden-flash-lite-v1 \
+  --candidate artifacts/golden-flash-lite-v2 \
+  --output artifacts/local-v1-v2-comparison.json
+```
+
+The paired comparison reports the exact-match delta and bootstrap interval, cost multiplier, and prediction agreement. A candidate is not eligible for promotion if model errors or safety failures increase, regardless of aggregate accuracy.
+
+## Optional: use ADK Web
+
+Start the local development UI:
+
+```bash
 adk web --host 127.0.0.1 --port 8000 adk_apps
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000), select `github_issue_triage`, and paste an issue as JSON into the message box:
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), select `github_issue_triage`, and send:
 
 ```json
 {
@@ -139,16 +210,14 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000), select `github_issue_triage
 }
 ```
 
-The app uses `TRIAGE_MODEL` and `TRIAGE_PROMPT_PATH` from `.env`, so either Gemini or Groq works without code changes. Restart ADK Web after changing those settings. When Phoenix is enabled, Web requests are also exported to the `github-triage` Phoenix project.
+ADK Web reads `TRIAGE_MODEL` and `TRIAGE_PROMPT_PATH` from `.env`; restart it after changing either value. It is an unauthenticated development tool, so keep it bound to `127.0.0.1`. Use `triage evaluate`, not ADK Web, for repeatable dataset runs.
 
-ADK Web is an unauthenticated development tool. Keep it bound to `127.0.0.1`; do not expose it directly to a public or untrusted network. Use the CLI evaluation command—not ADK Web—for repeatable golden-dataset runs and promotion decisions.
+## Optional: build a custom dataset
 
-## Build and validate the dataset
-
-Fetch public issues (the GitHub token is optional, but raises the API rate limit):
+The fetcher uses public GitHub data without a token; setting `GITHUB_TOKEN` only raises the API rate limit.
 
 ```bash
-export GITHUB_TOKEN='...'
+export GITHUB_TOKEN='your-token'
 python scripts/fetch_github_issues.py \
   --repo python/pythondotorg \
   --state all \
@@ -156,121 +225,36 @@ python scripts/fetch_github_issues.py \
   --output datasets/raw/issues.jsonl
 ```
 
-The fetcher retains labels for sampling and audit, filters pull requests, and never feeds those labels to the agent. After manual annotation, validate both structure and split leakage:
+The fetcher excludes pull requests and retains labels only for sampling and audit. Before evaluating manually annotated data, run the dataset validator shown under local checks. See [the triage policy](docs/triage_policy.md) and [dataset format and freezing procedure](docs/dataset.md).
 
-```bash
-python scripts/validate_dataset.py datasets/calibration.jsonl datasets/golden_test.jsonl
-```
+## Optional: trace with local Phoenix
 
-See [docs/triage_policy.md](docs/triage_policy.md) before annotating and [docs/dataset.md](docs/dataset.md) for the record format and freezing procedure.
-
-## Run an evaluation
-
-Gemini example:
-
-```bash
-triage evaluate \
-  --dataset datasets/golden_test.jsonl \
-  --experiment eval-gemini-3-5-flash-lite-v2 \
-  --model gemini-3.5-flash-lite \
-  --prompt prompts/triage_v2.txt \
-  --input-price-per-million 0.30 \
-  --output-price-per-million 2.50 \
-  --requests-per-minute 12
-```
-
-Groq cost-model example:
-
-```bash
-triage evaluate \
-  --dataset datasets/golden_test.jsonl \
-  --experiment eval-groq-gpt-oss-20b-v2 \
-  --model groq/openai/gpt-oss-20b \
-  --prompt prompts/triage_v2.txt \
-  --input-price-per-million 0.075 \
-  --output-price-per-million 0.30 \
-  --requests-per-minute 6
-```
-
-For the quality arm, use `groq/openai/gpt-oss-120b` with $0.15 input and $0.60 output per million tokens. These Groq prices and free-tier limits were retrieved on 2026-09-05 from the official [model catalog](https://console.groq.com/docs/models) and [rate-limit table](https://console.groq.com/docs/rate-limits). Although the free tier permits 30 requests per minute and 1,000 requests per day for each candidate, its 8,000-token-per-minute limit is the practical bottleneck. Six requests per minute worked for the recorded prompt-v2 runs, but rolling usage and account limits can vary; reduce the value to four after an HTTP 429 response.
-
-Use the current provider list prices rather than `0` for a meaningful normalized production-cost comparison. Pricing is supplied at run time so historical experiments remain reproducible when vendor prices change.
-
-`--requests-per-minute` is optional. Set it below the provider quota for sequential, reproducible free-tier runs. Quota failures are retried up to three times by default; these controls can be changed with `--max-attempts` and `--retry-delay-seconds`.
-
-Artifacts are written to `artifacts/<experiment>/`:
-
-- `predictions.jsonl` — per-case output, latency, usage, and error
-- `metrics.json` — aggregate quality, safety, latency, and cost metrics
-- `report.md` — concise human-readable summary
-- `config.json` — frozen experiment configuration
-
-An experiment is not a promotion candidate if model errors, any high-priority downgrade, critical `high -> low` under-triage, or human-review false negatives increase, even when aggregate accuracy improves.
-
-Compare two runs evaluated on the identical case IDs:
-
-```bash
-triage compare \
-  --baseline artifacts/golden-flash-lite-v1 \
-  --candidate artifacts/golden-flash-lite-v2 \
-  --output artifacts/comparisons/golden-prompt-v1-v2.json
-```
-
-The comparison uses paired bootstrap resampling, reports the confidence interval for the exact-match delta, cost multiplier, exact prediction agreement, and per-field agreement. A promotion is recommended only for a statistically clear improvement with no safety or reliability regression; a human should still make the final cost/latency trade-off.
-
-## Provider and data-safety notes
-
-- `--model` determines which provider receives the issue title and body. Gemini model IDs use Google's native connector; `groq/...` IDs use Groq through LiteLLM.
-- Both providers may be configured simultaneously, but each evaluation uses exactly one model and records that model ID in `config.json`.
-- The checked-in real cases are sourced from public GitHub issues, while synthetic cases may still describe security, credentials, availability, or customer-data scenarios. Obtain approval for the intended external provider before transmitting a frozen dataset.
-- Free-tier billing does not imply zero production cost. Reports use normalized list prices so configurations remain economically comparable.
-
-## Local Phoenix tracing
-
-Install the optional integration and start Phoenix:
+Install the observability extra and start the checked-in Docker Compose service:
 
 ```bash
 python -m pip install -e '.[observability]'
-docker compose up phoenix
-export TRIAGE_ENABLE_PHOENIX=true
-export PHOENIX_BASE_URL=http://localhost:6006
-export TRIAGE_PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces
-triage issue --title '...' --body '...'
+docker compose up -d phoenix
 ```
 
-Publish a saved golden run as a Phoenix dataset and fully scored experiment without making new model calls:
+Replay a saved run into Phoenix without making model calls:
 
 ```bash
 triage phoenix \
   --dataset datasets/golden_test.jsonl \
-  --predictions artifacts/golden-groq-gpt-oss-20b-v2/predictions.jsonl \
-  --experiment-name golden-groq-20b-v2-phoenix-replay
+  --predictions artifacts/golden-flash-lite-v2/predictions.jsonl \
+  --experiment-name local-gemini-v2-replay
 ```
 
-This registers the frozen prompt, creates or reuses the fingerprinted dataset, traces every replayed task row, and attaches eight deterministic correctness/safety annotations per row. A separate `--live` mode runs fresh, fully traced Gemini or verified Groq calls. The selected provider must have its API key in the environment.
+Browse the result at [http://localhost:6006](http://localhost:6006). To export new `triage issue`, `triage evaluate`, or ADK Web traces, set `TRIAGE_ENABLE_PHOENIX=true` and `TRIAGE_PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces` in `.env`. The optional `PHOENIX_PROJECT_NAME` defaults to `github-triage`.
 
-Run Gemini live in Phoenix:
+Phoenix also supports a `--live` mode that makes fresh provider calls. See [the Phoenix guide](docs/phoenix_experiments.md) for setup and evaluator details and [the model comparison runbook](docs/model_comparison_runbook.md) for complete Gemini and Groq workflows. File artifacts remain the source of truth for promotion decisions.
 
-```bash
-triage phoenix \
-  --live \
-  --dataset datasets/golden_test.jsonl \
-  --model gemini-3.5-flash-lite \
-  --prompt prompts/triage_v2.txt \
-  --requests-per-minute 6 \
-  --experiment-name golden-gemini-flash-lite-v2-live
-```
+## Provider and data-safety notes
 
-Live mode sends every dataset input to the selected external provider. Use it only after approving that provider and dataset combination. Gemini IDs must begin with `gemini-`; Groq remains restricted to the two verified GPT-OSS models.
-
-Browse Phoenix at [http://localhost:6006](http://localhost:6006). See [docs/phoenix_experiments.md](docs/phoenix_experiments.md) for exact setup, evaluator semantics, and the verified local parity result. The [model comparison runbook](docs/model_comparison_runbook.md) contains copy-paste evaluation, paired comparison, Phoenix replay, and live-run commands for all selected Gemini and Groq models. Files produced by the harness remain the source of truth for pass/fail decisions.
-
-## Test
-
-```bash
-pytest
-ruff check .
-```
+- `--model` determines which provider receives the issue title and body: `gemini-...` uses Google's native connector and `groq/...` uses Groq through LiteLLM.
+- Both providers may be configured, but each evaluation uses one model and records it in `config.json`.
+- Real cases come from public GitHub issues, but synthetic cases can still describe sensitive scenarios. Approve the provider and dataset combination before transmitting a frozen split.
+- Free-tier billing does not imply zero production cost; normalized list prices keep configurations comparable.
 
 ## Key decisions and assumptions
 
@@ -282,13 +266,5 @@ ruff check .
 - Human-review false negatives, any high-priority downgrade, and `high -> low` under-triage are explicit safety gates.
 - Free-tier billing does not make inference economically free; experiments report normalized list-price cost.
 - A small dataset yields wide uncertainty, so the report includes a bootstrap confidence interval and avoids overstating small improvements.
-
-## Reproducibility and submission record
-
-The [submission record](docs/submission_record.md) freezes the model IDs and historical
-prices, dataset and prompt SHA-256 hashes, experiment source commits, release/privacy audit,
-and a curated reasoning trail. It also records the important limitation that several early
-experiment configurations correctly reported a dirty working tree; their exact prompt and
-dataset inputs remain independently pinned by content hashes.
 
 The working plan and deliberately deferred scope are recorded in [docs/implementation_plan.md](docs/implementation_plan.md) and [docs/assumptions.md](docs/assumptions.md).

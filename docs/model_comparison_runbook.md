@@ -46,11 +46,30 @@ covered by a free tier. Prices were verified on 2026-09-06 from the official
 
 The Gemini 3.8 and 3.6 values are introductory prices through December 31, 2026.
 
+## Recorded Gemini verification
+
+Four completed owner-run experiments from 2026-09-06 are checked in. All contain 35
+successful predictions and zero errors on dataset v1.
+
+| Configuration | Exact match | Human FN | High downgrades | Mean latency | Cost / 1K |
+|---|---:|---:|---:|---:|---:|
+| Gemini 3.5 Flash-Lite + v2 | 54.3% | 5 | 2 | 1.37 s | $0.3815 |
+| Gemini 3.5 Flash-Lite + v5 | 57.1% | 3 | 1 | 1.35 s | $0.4976 |
+| Gemini 3.8 Flash + v2 | 54.3% | 3 | 0 | 5.66 s | $0.8777 |
+| Gemini 3.8 Flash + v5 | 54.3% | 2 | 0 | 5.46 s | $1.1726 |
+
+The paired Gemini 3.8 v2 comparison passed the safety non-regression gates against the new
+Flash-Lite v2 run, but exact match did not improve (95% bootstrap interval for the delta:
+-20.0 to +20.0 points), cost increased 2.30x, and mean latency increased 4.13x. It is not
+promoted. Prompt v5 was also not promoted on either model because its paired accuracy gain
+was not statistically clear and its normalized cost was higher. Detailed results and the
+repeat-stability finding are in `docs/milestone4_results.md`.
+
 ## 1. Run local evaluations
 
 The six commands deliberately use the same dataset, prompt, and six requests per minute.
-Add a unique suffix before repeating a run; reusing a name overwrites that experiment's
-files under `artifacts/`.
+Add a unique suffix before repeating a run. Experiment directories are immutable, so
+reusing a name fails instead of overwriting the existing files under `artifacts/`.
 
 ### Gemini 3.5 Flash-Lite baseline
 
