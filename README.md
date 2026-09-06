@@ -283,4 +283,12 @@ ruff check .
 - Free-tier billing does not make inference economically free; experiments report normalized list-price cost.
 - A small dataset yields wide uncertainty, so the report includes a bootstrap confidence interval and avoids overstating small improvements.
 
+## Reproducibility and submission record
+
+The [submission record](docs/submission_record.md) freezes the model IDs and historical
+prices, dataset and prompt SHA-256 hashes, experiment source commits, release/privacy audit,
+and a curated reasoning trail. It also records the important limitation that several early
+experiment configurations correctly reported a dirty working tree; their exact prompt and
+dataset inputs remain independently pinned by content hashes.
+
 The working plan and deliberately deferred scope are recorded in [docs/implementation_plan.md](docs/implementation_plan.md) and [docs/assumptions.md](docs/assumptions.md).

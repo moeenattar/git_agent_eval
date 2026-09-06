@@ -64,12 +64,17 @@ See `docs/prompt_optimization_results.md` for the complete decision record.
 
 ## Milestone 5 Submission
 
-Status: next
+Status: complete — submission record prepared and release audit completed on 2026-09-06
 
-- Add actual results and failure analysis to the README.
-- Document model IDs, prices and retrieval dates, dataset hashes, prompt hashes, and git commits.
-- Make the repository public only after checking history for secrets and private data.
-- Link the planning conversation or export in the reasoning trail if appropriate.
+- [x] Add actual results and failure analysis to the README.
+- [x] Document model IDs, historical prices and retrieval dates, dataset hashes, prompt hashes, and git commits.
+- [x] Scan all reachable Git history and the frozen dataset for known secrets and private-data indicators.
+- [x] Verify the GitHub repository is public after the release audit.
+- [x] Publish a curated, secret-free export of the planning rationale instead of the raw conversation.
+
+See `docs/submission_record.md` for the reproducibility ledger, experiment-to-commit map,
+release/privacy audit, and reasoning trail. Milestone 5 did not require new model calls or
+change the Milestone 4 selection decision.
 
 ## Deliberately deferred
 
