@@ -109,6 +109,8 @@ TRIAGE_PROMPT_PATH=prompts/triage_v2.txt
 
 `GEMINI_API_KEY` is also accepted by the Gemini SDK. The CLI loads `.env` automatically, and Git ignores it. Never commit or paste real keys into commands, documentation, artifacts, or issue data.
 
+Sign up on Google Ai Studio to generate an API Key - https://aistudio.google.com/api-keys
+
 ### 3. Triage your first issue
 
 ```bash
